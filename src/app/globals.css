@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   EDVORA THEME COLORS
+================================ */
+:root {
+  --edvora-primary: 59 117 177;     /* #3B6FB6 */
+  --edvora-secondary: 111 168 67;   /* #6FA843 */
+  --edvora-navy: 31 60 139;         /* #1F3C8B */
+  --edvora-bg: 255 255 255;
+  --edvora-text: 46 46 46;
+}
+
+body {
+  background-color: rgb(var(--edvora-bg));
+  color: rgb(var(--edvora-text));
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 560ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
