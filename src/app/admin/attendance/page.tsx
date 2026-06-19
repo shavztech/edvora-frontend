@@ -108,10 +108,15 @@ export default function AdminAttendancePage() {
       setDetailLoading(false);
     }
   };
+useEffect(() => {
+  fetchUsers();
 
-  useEffect(() => {
+  const interval = setInterval(() => {
     fetchUsers();
-  }, []);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     if (selectedUser) {

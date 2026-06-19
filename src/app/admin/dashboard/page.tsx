@@ -92,9 +92,15 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  loadData();
+
+  const interval = setInterval(() => {
     loadData();
-  }, []);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval);
+}, []);
 
   if (loading) {
     return (

@@ -78,7 +78,7 @@ export default function StudentSlots() {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
   const [selectedState, setSelectedState] = useState("");
-
+  const [isBlocked, setIsBlocked] = useState(false);
   // Selections per mentor card (for booking)
   const [selections, setSelections] = useState<{
     [mentorId: string]: {
@@ -89,22 +89,33 @@ export default function StudentSlots() {
   }>({});
 
   const loadSlots = async () => {
-    try {
-      const res = await api.get("/slots/available");
-      setSlots(res.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load slots");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const [slotsRes, userRes] = await Promise.all([
+      api.get("/slots/available"),
+      api.get("/auth/me")
+    ]);
+     console.log("API USER:", userRes.data);
+console.log("isBlocked:", userRes.data.user.isBlocked);
+    setSlots(slotsRes.data);
+   setIsBlocked(userRes.data.user.isBlocked);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load slots");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadSlots();
   }, []);
 
   const bookSlot = async (mentorId: string) => {
+    
+    if (isBlocked) {
+  toast.error("Your account is blocked by admin");
+  return;
+}
     const selection = selections[mentorId];
     if (!selection?.slotId) {
       toast.error("Please select a time slot");
@@ -487,13 +498,25 @@ export default function StudentSlots() {
 
                 {/* Bottom Section Compact */}
                 <div className="p-4 sm:p-5.5 bg-white border-t border-gray-50 flex flex-col items-center gap-3">
+                  
                   <button
-                    onClick={() => bookSlot(mentorId)}
-                    className="w-full bg-black text-white py-3 rounded-2xl font-black text-base tracking-tight shadow-xl shadow-black/5 hover:bg-gray-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 group"
-                  >
-                    Book Session Now
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
+  onClick={() => bookSlot(mentorId)}
+  disabled={isBlocked}
+  className={`w-full py-3 rounded-2xl font-black text-base tracking-tight transition-all flex items-center justify-center gap-2.5
+
+    ${
+      isBlocked
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-black text-white hover:bg-gray-900"
+    }
+  `}
+>
+  {isBlocked ? "Account Blocked" : "Book Session Now"}
+
+  {!isBlocked && (
+    <ChevronRight className="w-5 h-5" />
+  )}
+</button>
                   <div className="flex items-center gap-1.5 text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">
                     <Clock className="w-3.5 h-3.5" />
                     60 MIN DURATION

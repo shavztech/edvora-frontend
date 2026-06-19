@@ -144,10 +144,15 @@ export default function AdminPaymentsPage() {
     setFilterDate("");
     setFilterMethod("");
   };
+useEffect(() => {
+  loadPayments();
 
-  useEffect(() => {
+  const interval = setInterval(() => {
     loadPayments();
-  }, [filterStatus, filterDate, filterMethod]);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval);
+}, [filterStatus, filterDate, filterMethod]);
 
   const StatusBadge = ({ status }: { status: string }) => {
     const s = status.toLowerCase();

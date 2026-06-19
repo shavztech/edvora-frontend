@@ -33,9 +33,15 @@ export default function AdminDemoRequestsListPage() {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  loadDemos();
+
+  const interval = setInterval(() => {
     loadDemos();
-  }, []);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval);
+}, []);
 
   const handleAccept = async (id: string) => {
     if (!window.confirm("Are you sure you want to accept this demo request?")) return;

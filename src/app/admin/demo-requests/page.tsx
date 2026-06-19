@@ -59,8 +59,14 @@ export default function AdminDemoPage() {
   };
 
   useEffect(() => {
+  loadDemos();
+
+  const interval = setInterval(() => {
     loadDemos();
-  }, [filterStatus, filterDate]);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval);
+}, [filterStatus, filterDate]);
 
   const handleAccept = async (id: string) => {
     setProcessingId(id);

@@ -89,9 +89,15 @@ export default function AdminBookingsPage() {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  loadBookings();
+
+  const interval = setInterval(() => {
     loadBookings();
-  }, []);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, []);
 
   // Removed handleApplyFilters as it's now automatic via useEffect
 

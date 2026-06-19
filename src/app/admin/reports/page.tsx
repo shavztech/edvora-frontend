@@ -52,6 +52,7 @@ export default function AdminReportsPage() {
       setReports(prev =>
         prev.map(r => r._id === id ? { ...r, isRead: true } : r)
       );
+      await loadReports(filterStatus);
     } catch (error) {
       toast.error("Failed to mark as read");
     } finally {
@@ -59,18 +60,19 @@ export default function AdminReportsPage() {
     }
   };
 
-  const deleteReport = async (id: string) => {
-    setDeletingId(id);
-    try {
-      await api.delete(`/reports/${id}`);
-      toast.success("Report deleted successfully");
-      setReports(prev => prev.filter(r => r._id !== id));
-    } catch (error) {
-      toast.error("Failed to delete the report");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+ const deleteReport = async (id: string) => {
+  setDeletingId(id);
+  try {
+    await api.delete(`/reports/${id}`);
+    toast.success("Report deleted successfully");
+
+    await loadReports(filterStatus);
+  } catch (error) {
+    toast.error("Failed to delete the report");
+  } finally {
+    setDeletingId(null);
+  }
+};
 
   const confirmDelete = (id: string, title: string) => {
     toast(
@@ -108,9 +110,15 @@ export default function AdminReportsPage() {
     loadReports(status);
   };
 
-  useEffect(() => {
-    loadReports("all");
-  }, []);
+ useEffect(() => {
+  loadReports(filterStatus);
+
+  const interval = setInterval(() => {
+    loadReports(filterStatus);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval);
+}, [filterStatus]);
 
   const pendingCount = reports.filter(r => !r.isRead).length;
   const readCount = reports.filter(r => r.isRead).length;

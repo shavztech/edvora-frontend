@@ -5,6 +5,7 @@ import api from "@/lib/api";
 import Loader from "@/components/Loader";
 import { User, Mail, Shield, ShieldAlert, Edit2, CheckCircle2, XCircle, Briefcase, MapPin, BookOpen, GraduationCap, Calendar, X, Search, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const isStudentUnpaid = (student: any, allPayments: any[]) => {
   if (student.role !== "student") return false;
@@ -38,6 +39,7 @@ const isStudentUnpaid = (student: any, allPayments: any[]) => {
 };
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,16 +85,9 @@ export default function AdminUsersPage() {
     }).catch(err => console.error("Failed to fetch admin settings", err));
   }, []);
 
-  const openUserDetails = async (userId: string) => {
-    try {
-      const res = await api.get(`/admin/users/${userId}`);
-      setSelectedUser(res.data.user);
-      setEditForm(res.data.user);
-      setIsEditMode(false);
-    } catch (err) {
-      toast.error("Failed to fetch user details");
-    }
-  };
+  const openUserDetails = (userId: string) => {
+  router.push(`/admin/users/${userId}`);
+};
 
   const handleBlockToggle = async () => {
     if (!selectedUser) return;
@@ -301,145 +296,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* User Details / Edit Modal */}
-      {selectedUser && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg border border-slate-200/50 flex flex-col scale-in-center">
-            
-            {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-slate-100">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-lg sm:text-xl font-bold text-slate-800 truncate">{selectedUser.name}</h2>
-                  <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                    <span className={`inline-flex items-center gap-1 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border ${
-                      selectedUser.isBlocked ? "bg-red-50 text-red-600 border-red-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                    }`}>
-                      {selectedUser.isBlocked ? "Blocked" : "Active"}
-                    </span>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-widest border border-slate-200">
-                      {selectedUser.role}
-                    </span>
-                    {selectedUser.role === "student" && isStudentUnpaid(selectedUser, payments) && (
-                      <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 uppercase tracking-widest border border-amber-100 flex items-center gap-1">
-                        Unpaid
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <button 
-                onClick={() => { setSelectedUser(null); setIsEditMode(false); }}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors shrink-0"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-4 sm:p-6 flex-1 bg-slate-50/50">
-              {isEditMode ? (
-                <EditForm 
-                  user={selectedUser} 
-                  editForm={editForm} 
-                  setEditForm={setEditForm} 
-                />
-              ) : (
-                <div className="space-y-4 sm:space-y-6">
-                  {/* Basic Info */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <InfoTile icon={<Mail />} label="Email" value={selectedUser.email} />
-                    <InfoTile icon={<Calendar />} label="Joined" value={new Date(selectedUser.createdAt).toLocaleDateString()} />
-                  </div>
-                  
-                  {/* Onboarding Info */}
-                  <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 className="font-bold text-slate-800 mb-3 sm:mb-4 flex items-center gap-2 text-sm">
-                      <BookOpen className="w-4 h-4 text-primary" />
-                      Academic Details
-                    </h3>
-                    
-                    {selectedUser.role === "student" ? (
-                      <div className="flex flex-col gap-1.5">
-                        <DetailRow label="Syllabus" value={selectedUser.onboarding?.syllabus || selectedUser.syllabus || "N/A"} />
-                        <DetailRow label="Class" value={selectedUser.studentOnboarding?.class || selectedUser.studentOnboarding?.classLevel || selectedUser.onboarding?.class || selectedUser.onboarding?.classLevel || "N/A"} />
-                        <DetailRow label="Course Type" value={selectedUser.studentOnboarding?.courseType || selectedUser.onboarding?.courseType || "N/A"} />
-                        <DetailRow label="Subjects" value={(selectedUser.studentOnboarding?.subjects || selectedUser.onboarding?.subjects || []).join(", ") || "N/A"} />
-                      </div>
-                    ) : selectedUser.role === "mentor" ? (
-                      <div className="flex flex-col gap-1.5">
-                        <DetailRow label="Syllabus" value={selectedUser.mentorOnboarding?.syllabus || "N/A"} />
-                        <DetailRow label="Experience" value={selectedUser.mentorOnboarding?.experience || "N/A"} />
-                        <DetailRow label="Classes handling" value={(selectedUser.mentorOnboarding?.classes || []).join(", ") || "N/A"} />
-                        <DetailRow label="Subjects" value={(selectedUser.mentorOnboarding?.subjects || []).join(", ") || "N/A"} />
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                        <Shield className="w-8 h-8 text-slate-300 mb-2" />
-                        <p className="text-xs font-bold text-slate-500 italic">Administrative Account</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-2xl">
-               <div className="w-full sm:w-auto">
-                  {!isEditMode && (currentAdmin?.role === "super_admin" || selectedUser?.role !== "admin") && (
-                     <button
-                        onClick={handleBlockToggle}
-                        disabled={processingBlock}
-                        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[9px] uppercase tracking-widest font-black transition-colors disabled:opacity-50 border ${
-                          selectedUser.isBlocked 
-                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100" 
-                            : "bg-red-50 text-red-700 hover:bg-red-100 border-red-100"
-                        }`}
-                     >
-                        {selectedUser.isBlocked ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
-                        {selectedUser.isBlocked ? "Unblock" : "Block"}
-                     </button>
-                  )}
-               </div>
-               
-               <div className="flex gap-2 w-full sm:w-auto">
-                 {isEditMode ? (
-                   <>
-                    <button 
-                      onClick={() => setIsEditMode(false)}
-                      className="flex-1 sm:flex-none px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      onClick={handleSaveEdit}
-                      className="flex-1 sm:flex-none px-6 py-2 bg-primary text-white hover:bg-primary/90 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-colors"
-                    >
-                      Save
-                    </button>
-                   </>
-                 ) : (
-                    (currentAdmin?.role === "super_admin" || selectedUser?.role !== "admin") && (
-                      <button 
-                        onClick={() => setIsEditMode(true)}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-slate-900/10 transition-colors"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                        Edit
-                      </button>
-                    )
-                 )}
-               </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
+      
     </div>
   );
 }

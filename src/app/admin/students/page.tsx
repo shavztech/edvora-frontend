@@ -4,23 +4,31 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
 
-export default function AdminMentorsPage() {
-  const [mentors, setStudents] = useState<any[]>([]);
+export default function AdminStudentsPage() {
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadStudents = async () => {
-      try {
-        const res = await api.get("/admin/students");
-        setStudents(res.data.students || []);
-      } catch (err) {
-        console.error("Failed to load students", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadStudents = async (showLoader: boolean = false) => {
+    try {
+      if (showLoader) setLoading(true);
 
-    loadStudents();
+      const res = await api.get("/admin/students");
+      setStudents(res.data.students || []);
+    } catch (err) {
+      console.error("Failed to load students", err);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStudents(true);
+
+    const interval = setInterval(() => {
+      loadStudents(false);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <Loader />;
@@ -37,13 +45,14 @@ export default function AdminMentorsPage() {
             <th className="border p-2">Status</th>
           </tr>
         </thead>
+
         <tbody>
-          {mentors.map((s) => (
-            <tr key={s._id}>
-              <td className="border p-2">{s.name}</td>
-              <td className="border p-2">{s.email}</td>
+          {students.map((student) => (
+            <tr key={student._id}>
+              <td className="border p-2">{student.name}</td>
+              <td className="border p-2">{student.email}</td>
               <td className="border p-2">
-                {s.isBlocked ? (
+                {student.isBlocked ? (
                   <span className="text-red-600">Blocked</span>
                 ) : (
                   <span className="text-green-600">Active</span>
@@ -52,7 +61,7 @@ export default function AdminMentorsPage() {
             </tr>
           ))}
 
-          {mentors.length === 0 && (
+          {students.length === 0 && (
             <tr>
               <td colSpan={3} className="text-center p-4 text-gray-500">
                 No students found

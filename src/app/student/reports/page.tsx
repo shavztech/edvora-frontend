@@ -18,6 +18,8 @@ import toast from "react-hot-toast";
 export default function StudentReportsPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mentorId, setMentorId] = useState("");
+const [mentors, setMentors] = useState<any[]>([]);
 
   // ➕ New report
   const [title, setTitle] = useState("");
@@ -40,34 +42,55 @@ export default function StudentReportsPage() {
     }
   };
 
-  useEffect(() => {
-    loadReports();
-  }, []);
+ useEffect(() => {
+  loadReports();
+  
+ const loadMentors = async () => {
+  try {  
+  const res = await api.get("/mentors/all");
 
-  // ⏱️ Edit allowed only for 5 minutes
-  const canEdit = (createdAt: string) => {
-    const diff =
-      (Date.now() - new Date(createdAt).getTime()) / 1000;
-    return diff <= 300;
-  };
+    console.log("MENTORS DATA:", res.data);
+
+    setMentors(res.data.mentors || res.data || []);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load mentors");
+  }
+};
+
+  loadMentors();
+}, []);
+const canEdit = (createdAt: string) => {
+  const diff =
+    (Date.now() - new Date(createdAt).getTime()) / 1000;
+
+  return diff <= 300;
+};
 
   // ➕ Submit report
   const submitReport = async () => {
-    if (!title || !message)
-      return toast.error("Please fill in all fields");
+  if (!mentorId || !title || !message) {
+    return toast.error("Please fill in all fields");
+  }
 
-    // Prevent submitting if already loading (optional enhancement)
+  try {
+    await api.post("/reports", {
+      mentorId,
+      title,
+      message,
+    });
 
-    try {
-      await api.post("/reports", { title, message });
-      toast.success("Report submitted successfully");
-      setTitle("");
-      setMessage("");
-      loadReports();
-    } catch (error) {
-      toast.error("Failed to submit report");
-    }
-  };
+    toast.success("Report submitted successfully");
+
+    setMentorId("");
+    setTitle("");
+    setMessage("");
+
+    loadReports();
+  } catch (error) {
+    toast.error("Failed to submit report");
+  }
+};
 
   // ✏️ Start edit
   const startEdit = (r: any) => {
@@ -120,6 +143,25 @@ export default function StudentReportsPage() {
             </div>
 
             <div className="space-y-5">
+              <div>
+  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">
+    Mentor
+  </label>
+
+  <select
+    value={mentorId}
+    onChange={(e) => setMentorId(e.target.value)}
+    className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+  >
+    <option value="">Select Mentor</option>
+
+    {mentors.map((mentor: any) => (
+      <option key={mentor._id} value={mentor._id}>
+        {mentor.name}
+      </option>
+    ))}
+  </select>
+</div>
               <div className="group">
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1 transition-colors group-focus-within:text-primary">Subject</label>
                 <div className="relative transform transition-transform duration-200 focus-within:scale-[1.01]">

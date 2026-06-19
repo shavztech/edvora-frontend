@@ -28,15 +28,16 @@ interface Slot {
     email?: string;
     subjects?: string[];
     mentorOnboarding?: {
-      syllabus?: string;
-      classes?: [string];
-      subjects?: [string];
-    };
-    onboardingData?: {
-      syllabus?: string;
-      classLevel?: string;
-      subjects?: [string];
-    };
+  syllabus?: string;
+  classes?: string[];
+  subjects?: string[];
+};
+
+onboardingData?: {
+  syllabus?: string;
+  classLevel?: string;
+  subjects?: string[];
+};
   };
 }
 
@@ -67,22 +68,30 @@ export default function AdminSlotsPage() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadSlots = async () => {
-    try {
-      const res = await api.get("/admin/slots");
-      setSlots(res.data);
-    } catch (error: any) {
-      console.error("ADMIN_SLOTS_LOAD_ERROR:", error);
-      toast.error("Failed to load mentor slots");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const loadSlots = async (showLoader = false) => {
+  try {
+    if (showLoader) setLoading(true);
 
-  useEffect(() => {
-    loadSlots();
-  }, []);
+    const res = await api.get("/admin/slots");
+    setSlots(res.data);
+  } catch (error: any) {
+    console.error("ADMIN_SLOTS_LOAD_ERROR:", error);
+  } finally {
+    if (showLoader) setLoading(false);
+  }
+};
 
+useEffect(() => {
+  // First load with spinner
+  loadSlots(true);
+
+  const interval = setInterval(() => {
+    // Auto refresh without spinner
+    loadSlots(false);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, []);
   // Group slots by mentor for Today only and calculate overall range
   const mentorGroups = useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -150,12 +159,12 @@ export default function AdminSlotsPage() {
         <div className="bg-gray-50 rounded-3xl border border-gray-100 p-12 text-center">
            <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-4" />
            <p className="text-gray-400 font-bold">No sessions scheduled for today.</p>
-           <button 
-             onClick={loadSlots}
-             className="mt-4 text-blue-600 text-xs font-black uppercase tracking-widest hover:underline"
-           >
-             Refresh Data
-           </button>
+           <button
+  onClick={() => loadSlots(true)}
+  className="mt-4 text-blue-600 text-xs font-black uppercase tracking-widest hover:underline"
+>
+  Refresh Data
+</button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
