@@ -24,7 +24,7 @@ export default function MentorReportsPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [response, setResponse] = useState("");
   const loadReports = async () => {
     try {
       setLoading(true);
@@ -81,7 +81,20 @@ export default function MentorReportsPage() {
       toast.error("Action not authorized");
     }
   };
+const sendResponse = async (id: string) => {
+  try {
+    await api.patch(`/reports/${id}/respond`, {
+      response,
+    });
 
+    toast.success("Response sent");
+
+    setResponse("");
+    loadReports();
+  } catch (error) {
+    toast.error("Failed to send response");
+  }
+};
   useEffect(() => {
     loadReports();
   }, []);
@@ -210,6 +223,21 @@ export default function MentorReportsPage() {
                       <p className="text-slate-600 text-sm md:text-base leading-relaxed bg-slate-50 p-5 rounded-2xl border border-slate-100 shadow-inner italic font-medium">
                         "{r.message}"
                       </p>
+                      <div className="mt-4 space-y-3">
+  <textarea
+    value={response}
+    onChange={(e) => setResponse(e.target.value)}
+    placeholder="Write response to student..."
+    className="w-full p-3 border border-slate-200 rounded-xl"
+  />
+
+  <button
+    onClick={() => sendResponse(r._id)}
+    className="px-4 py-2 bg-green-600 text-white rounded-xl"
+  >
+    Send Response
+  </button>
+</div>
                     </div>
                   </div>
 
