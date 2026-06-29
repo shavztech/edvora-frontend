@@ -6,10 +6,10 @@ export default function AdminHomePage() {
       <h1 className="text-2xl font-bold mb-6">Admin Overview</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard label="Total Students" value={120} />
-        <StatCard label="Active Subjects" value={8} />
-        <StatCard label="Pending Payments" value={15} />
-        <StatCard label="Blocked Users" value={3} />
+        <StatCard title="Total Students" value={120} />
+        <StatCard title="Active Subjects" value={8} />
+        <StatCard title="Pending Payments" value={15} />
+        <StatCard title="Blocked Users" value={3} />
       </div>
     </>
   );

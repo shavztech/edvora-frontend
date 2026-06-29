@@ -40,6 +40,9 @@ interface Booking {
   studentAttendance: boolean | null;
   mentorAttendance: boolean | null;
   attendanceStatus: "pending" | "completed" | "absent" | "conflict";
+  meetLink?: string;
+  demoStatus?: string;
+  mentorStatus?: string;
 }
 
 const formatTimeTo12h = (timeStr: string) => {
@@ -89,15 +92,25 @@ export default function AdminBookingsPage() {
     }
   };
 
- useEffect(() => {
-  loadBookings();
-
-  const interval = setInterval(() => {
+  useEffect(() => {
     loadBookings();
-  }, 10000);
 
-  return () => clearInterval(interval);
-}, []);
+    const markAsRead = async () => {
+      try {
+        await api.patch("/notifications/read-booking");
+        window.dispatchEvent(new CustomEvent("refresh-notifications"));
+      } catch (err) {
+        console.error("Failed to mark booking notifications as read", err);
+      }
+    };
+    markAsRead();
+
+    const interval = setInterval(() => {
+      loadBookings();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Removed handleApplyFilters as it's now automatic via useEffect
 
@@ -318,9 +331,40 @@ export default function AdminBookingsPage() {
                         <span className="text-[10px] font-black text-gray-600">{formatTimeTo12h(booking.startTime)}</span>
                      </div>
                   </div>
+
+                  {booking.meetLink && (
+                    <div className="bg-blue-50/50 px-4 py-2.5 rounded-2xl border border-blue-100 flex items-center justify-between">
+                       <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Meet Link</span>
+                       <a href={booking.meetLink} target="_blank" rel="noreferrer" className="text-[10px] font-black text-blue-600 hover:underline truncate max-w-[150px]">
+                         {booking.meetLink}
+                       </a>
+                    </div>
+                  )}
                </div>
 
                <div className="mt-auto space-y-3">
+                  {/* Demo Info */}
+                  {(booking.demoStatus || booking.mentorStatus) && (
+                    <div className="bg-purple-50/30 px-4 py-3 rounded-2xl border border-purple-100/50 space-y-2">
+                       <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest block">Demo Details</span>
+                       <div className="flex items-center justify-between">
+                         <span className="text-[9px] font-bold text-slate-500">Demo Status:</span>
+                         <span className="text-[9px] font-black uppercase tracking-widest text-purple-600">{booking.demoStatus || "N/A"}</span>
+                       </div>
+                       <div className="flex items-center justify-between">
+                         <span className="text-[9px] font-bold text-slate-500">Mentor Status:</span>
+                         <span className={`text-[9px] font-black uppercase tracking-widest ${
+                            booking.mentorStatus === 'mentor_accepted' ? 'text-green-600' : 
+                            booking.mentorStatus === 'mentor_rejected' ? 'text-red-600' : 'text-amber-600'
+                         }`}>
+                           {booking.mentorStatus === 'mentor_accepted' ? 'Accepted' : 
+                            booking.mentorStatus === 'mentor_rejected' ? 'Rejected' : 
+                            booking.mentorStatus || 'Pending'}
+                         </span>
+                       </div>
+                    </div>
+                  )}
+
                   {/* Attendance Tracking */}
                   <div className="bg-slate-50 px-4 py-3 rounded-2xl border border-slate-100 space-y-2">
                      <div className="flex items-center justify-between">

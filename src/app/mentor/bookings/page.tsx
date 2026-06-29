@@ -99,6 +99,18 @@ export default function MentorBookingsPage() {
     loadBookings();
   }, [filterDate, filterMonth, filterYear, filterAttendance]);
 
+  useEffect(() => {
+    const markAsRead = async () => {
+      try {
+        await api.patch("/notifications/read-booking");
+        window.dispatchEvent(new CustomEvent("refresh-notifications"));
+      } catch (err) {
+        console.error("Failed to mark booking notifications as read", err);
+      }
+    };
+    markAsRead();
+  }, []);
+
   const handleStatusUpdate = async (bookingId: string, status: "accepted" | "rejected") => {
     toast((t) => (
       <div className="flex flex-col gap-3 p-1">

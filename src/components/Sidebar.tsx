@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,14 +21,15 @@ import {
   AlertOctagon
 } from "lucide-react";
 import toast from "react-hot-toast";
-
+import api from "@/lib/api";
 type Role = "super_admin" | "admin" | "student" | "mentor";
 
 export default function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, close } = useSidebar();
-
+  const [demoNotificationCount, setDemoNotificationCount] = useState(0);
+  const [bookingNotificationCount, setBookingNotificationCount] = useState(0);
   // Close sidebar on route change (mobile)
   useEffect(() => {
     close();
@@ -41,6 +42,8 @@ export default function Sidebar({ role }: { role: Role }) {
         <div className="flex gap-2">
           <button
             onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
               localStorage.clear();
               toast.dismiss(t.id);
               window.location.href = "/auth/login";
@@ -62,7 +65,37 @@ export default function Sidebar({ role }: { role: Role }) {
       position: "top-center",
     });
   };
+useEffect(() => {
+  if (!["admin", "super_admin", "mentor"].includes(role)) return;
 
+  const load = async () => {
+    try {
+      const demoType = (role === "admin" || role === "super_admin") ? "demo_request" : "mentor_demo";
+      const demoRes = await api.get(
+        `/notifications/count?type=${demoType}&t=${Date.now()}`
+      );
+      setDemoNotificationCount(demoRes.data.count);
+
+      const bookingRes = await api.get(
+        `/notifications/count?type=booking&t=${Date.now()}`
+      );
+      setBookingNotificationCount(bookingRes.data.count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  load();
+
+  const id = setInterval(load, 3000);
+
+  window.addEventListener("refresh-notifications", load);
+
+  return () => {
+    clearInterval(id);
+    window.removeEventListener("refresh-notifications", load);
+  };
+}, [role]);
   const menuIcons: Record<string, any> = {
     "Dashboard": LayoutDashboard,
     "onboarding": UserCircle,
@@ -80,7 +113,8 @@ export default function Sidebar({ role }: { role: Role }) {
     "Users": Users,
     "Unpaid": AlertOctagon,
     "My Attendance": ClipboardCheck,
-    "Attendance": ClipboardCheck,
+    "Attendance": ClipboardCheck, 
+    "Demo Requests": FileText,
   };
 
   const menus: Record<Role, { label: string; href: string }[]> = {
@@ -124,6 +158,7 @@ export default function Sidebar({ role }: { role: Role }) {
       { label: "Onboarding", href: "/mentor/onboarding" },
       { label: "Slots", href: "/mentor/slots" },
       { label: "Bookings", href: "/mentor/bookings" },
+      { label: "Demo Requests", href: "/mentor/demo-requests" },
       { label: "My Attendance", href: "/mentor/attendance" },
       { label: "Reports", href: "/mentor/reports" },
       { label: "Settings", href: "/mentor/settings" },
@@ -188,7 +223,31 @@ export default function Sidebar({ role }: { role: Role }) {
                 `}
               >
                 <Icon className={`w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-white" : "text-slate-500 group-hover:text-indigo-400"}`} />
-                <span className="capitalize tracking-wide">{m.label}</span>
+              <div className="flex items-center w-full">
+  <span className="capitalize tracking-wide flex-1">
+    {m.label}
+  </span>
+
+  {m.label === "Demo Requests" &&
+ (role === "admin" ||
+  role === "super_admin" ||
+  role === "mentor") &&
+ demoNotificationCount > 0 && (
+    <span className="ml-auto flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] font-bold">
+      {demoNotificationCount}
+    </span>
+  )}
+
+  {m.label === "Bookings" &&
+ (role === "admin" ||
+  role === "super_admin" ||
+  role === "mentor") &&
+ bookingNotificationCount > 0 && (
+    <span className="ml-auto flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] font-bold">
+      {bookingNotificationCount}
+    </span>
+  )}
+</div>
                 {isActive && (
                   <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
                 )}

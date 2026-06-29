@@ -15,14 +15,21 @@ export default function LoginPage() {
     try {
       const res = await api.post("/auth/login", { email, password });
 
-      if (!res.data?.user) {
+      // Clear any old session data first
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      const user = res.data?.user || res.data?.data?.user;
+      const token = res.data?.token || res.data?.data?.token || res.data?.accessToken;
+
+      if (!user || !token) {
         throw new Error("Invalid login response");
       }
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      const role = res.data.user.role;
+      const role = user.role;
 
       if (role === "super_admin" || role === "admin") {
         router.push("/admin/dashboard");

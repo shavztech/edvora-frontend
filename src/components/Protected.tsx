@@ -15,10 +15,20 @@ export default function Protected({
 
   useEffect(() => {
     const user = getUser();
-    if (!user || !roles.includes(user.role)) {
+    if (!user) {
       router.replace("/auth/login");
+    } else if (!roles.includes(user.role)) {
+      if (user.role === "admin" || user.role === "super_admin") {
+        router.replace("/admin/dashboard");
+      } else if (user.role === "student") {
+        router.replace("/student/dashboard");
+      } else if (user.role === "mentor") {
+        router.replace("/mentor/dashboard");
+      } else {
+        router.replace("/auth/login");
+      }
     }
-  }, []);
+  }, [router, roles]);
 
   return <>{children}</>;
 }

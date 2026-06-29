@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import {
   Loader2,
-  User,
   Mail,
   Phone,
   BookOpen,
   GraduationCap,
   Layers,
   Calendar,
-  CheckCircle,
   Clock,
   X,
   Filter,
@@ -31,6 +29,22 @@ type DemoRequest = {
   subject: string;
   syllabus: string;
   status: "pending" | "accepted" | "rejected";
+  mentorStatus?: "pending" | "accepted" | "rejected";
+
+  slot?: {
+    _id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  };
+
+  meetLink?: string;
+
+  assignedMentor?: {
+    _id: string;
+    name: string;
+  };
+
   createdAt: string;
 };
 
@@ -42,86 +56,266 @@ export default function AdminDemoPage() {
   const [filterDate, setFilterDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const loadDemos = async () => {
+  interface Mentor {
+    _id: string;
+    name: string;
+    email: string;
+  }
+
+  interface Slot {
+    _id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }
+
+  // Mentor & Slot state management
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [selectedMentorId, setSelectedMentorId] = useState<Record<string, string>>({});
+  const [selectedSlotId, setSelectedSlotId] = useState<Record<string, string>>({});
+  const [slots, setSlots] = useState<Record<string, Slot[]>>({});
+
+  // Loading states
+  const [loadingMentors, setLoadingMentors] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState<Record<string, boolean>>({});
+
+  const formatSlotLabel = (slot: Slot) => {
+    let formattedDate = slot.date;
+    try {
+      const parts = slot.date.split("-");
+      if (parts.length === 3) {
+        const year = parts[0];
+        const monthNum = parseInt(parts[1], 10);
+        const day = parts[2];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        if (monthNum >= 1 && monthNum <= 12) {
+          formattedDate = `${day} ${months[monthNum - 1]} ${year}`;
+        }
+      }
+    } catch (e) {
+      console.error("Date formatting error:", e);
+    }
+
+    const formatTime = (time24: string) => {
+      try {
+        const parts = time24.split(":");
+        if (parts.length >= 2) {
+          const hour24 = parseInt(parts[0], 10);
+          const minutes = parts[1];
+          const period = hour24 >= 12 ? "PM" : "AM";
+          const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+          const displayHour = hour12 < 10 ? `0${hour12}` : hour12;
+          return `${displayHour}:${minutes} ${period}`;
+        }
+      } catch (e) {
+        console.error("Time formatting error:", e);
+      }
+      return time24;
+    };
+
+    return `${formattedDate} | ${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}`;
+  };
+
+  const loadDemos = useCallback(async () => {
     try {
       setLoading(true);
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (filterStatus) params.status = filterStatus;
       if (filterDate) params.date = filterDate;
 
       const res = await api.get("/admin/demo", { params });
       setDemos(res.data);
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to load demo requests.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus, filterDate]);
 
-  useEffect(() => {
-  loadDemos();
-
-  const interval = setInterval(() => {
-    loadDemos();
-  }, 10000); // 10 seconds
-
-  return () => clearInterval(interval);
-}, [filterStatus, filterDate]);
-
-  const handleAccept = async (id: string) => {
-    setProcessingId(id);
+  const loadMentors = useCallback(async () => {
     try {
-      const res = await api.put(`/admin/demo/${id}/accept`);
-      if (res.data.success) {
-        toast.success("Demo request accepted!");
-        setDemos((prev) =>
-          prev.map((d) => d._id === id ? { ...d, status: "accepted" } : d)
-        );
-      }
-    } catch (err: any) {
-      toast.error("Failed to accept the request.");
+      setLoadingMentors(true);
+      const res = await api.get("/slots/available-mentors");
+      setMentors(res.data || []);
+    } catch (error) {
+      console.error("Failed to load available mentors:", error);
+      toast.error("Failed to load available mentors");
     } finally {
-      setProcessingId(null);
+      setLoadingMentors(false);
+    }
+  }, []);
+
+  const handleMentorChange = async (demoId: string, mentorId: string) => {
+    setSelectedMentorId((prev) => ({ ...prev, [demoId]: mentorId }));
+    
+    // Clear slot selection when mentor changes
+    setSelectedSlotId((prev) => {
+      const updated = { ...prev };
+      delete updated[demoId];
+      return updated;
+    });
+
+    if (!mentorId) return;
+
+    try {
+      setLoadingSlots((prev) => ({ ...prev, [mentorId]: true }));
+      const res = await api.get(`/slots/available/${mentorId}`);
+      setSlots((prev) => ({ ...prev, [mentorId]: res.data || [] }));
+    } catch (error) {
+      console.error("Failed to load available slots:", error);
+      toast.error("Failed to load available slots for this mentor");
+    } finally {
+      setLoadingSlots((prev) => ({ ...prev, [mentorId]: false }));
+    }
+  };
+useEffect(() => {
+  const init = async () => {
+    await loadDemos();
+
+    // Mark demo notifications as read
+    try {
+      await api.patch("/notifications/read-demo");
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const confirmAccept = (id: string, name: string) => {
-    toast(
-      (t) => (
-        <div className="flex flex-col gap-3 min-w-[260px]">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-            <p className="text-sm font-bold text-slate-800">Accept Demo Request?</p>
-          </div>
-          <p className="text-xs text-slate-500">
-            This will accept <span className="font-bold text-slate-700">{name}'s</span> demo request and notify them.
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => { toast.dismiss(t.id); handleAccept(id); }}
-              className="flex-1 py-2 bg-emerald-600 text-white text-xs font-black rounded-xl uppercase tracking-widest hover:bg-emerald-700 transition-colors"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="flex-1 py-2 bg-slate-100 text-slate-600 text-xs font-black rounded-xl uppercase tracking-widest hover:bg-slate-200 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: 10000 }
-    );
-  };
+  init();
+
+  const interval = setInterval(() => {
+    loadDemos();
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, [loadDemos]);
+
+  useEffect(() => {
+    loadMentors();
+  }, [loadMentors]);
+//   return () => clearInterval(interval);
+// }, [filterStatus, filterDate]);
+
+//   const handleAccept = async (id: string) => {
+//     const assignMentor = async (demoId: string) => {
+//   try {
+//     const mentorId = mentorMap[demoId];
+
+//     if (!mentorId) {
+//       return toast.error("Select a mentor first");
+//     }
+
+//     await api.patch(`/${demoId}/assign`, {
+//       mentorId,
+//     });
+
+//     toast.success("Mentor assigned");
+//     loadDemos();
+//   } catch (error) {
+//     console.log(error);
+//     toast.error("Assignment failed");
+//   }
+// };
+//     setProcessingId(id);
+//     try {
+//       const res = await api.put(`/admin/demo/${id}/accept`);
+//       if (res.data.success) {
+//         toast.success("Demo request accepted!");
+//         setDemos((prev) =>
+//           prev.map((d) => d._id === id ? { ...d, status: "accepted" } : d)
+//         );
+//       }
+//     } catch (err: any) {
+//       toast.error("Failed to accept the request.");
+//     } finally {
+//       setProcessingId(null);
+//     }
+//   };
+
+
 
   const handleReset = () => {
     setFilterStatus("");
     setFilterDate("");
     setSearchTerm("");
   };
+ const openWhatsApp = (demo: DemoRequest) => {
+  const phone = demo.phone.replace(/[^0-9]/g, "");
 
+  const date = demo.slot?.date || "To be confirmed";
+  const time = demo.slot
+    ? `${demo.slot.startTime} - ${demo.slot.endTime}`
+    : "To be confirmed";
+
+  const meet = demo.meetLink || "Will be shared shortly";
+
+  const message = `Hello ${demo.name} 👋
+
+🎉 Your Edvora Demo Class has been confirmed.
+
+━━━━━━━━━━━━━━━━━━
+
+📚 Subject: ${demo.subject}
+🎓 Class: ${demo.className}
+📖 Syllabus: ${demo.syllabus}
+
+📅 Date: ${date}
+⏰ Time: ${time}
+
+🔗 Meet Link:
+${meet}
+
+━━━━━━━━━━━━━━━━━━
+
+📌 Please join the meeting 5 minutes before the scheduled time.
+
+If you have any questions, feel free to contact us.
+
+Regards,
+Edvora Team 💙`;
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+};
+  const assignMentor = async (demoId: string) => {
+    try {
+      const mentorId = selectedMentorId[demoId];
+      const slotId = selectedSlotId[demoId];
+
+      if (!mentorId || !slotId) {
+        return toast.error("Select a mentor and an available slot first");
+      }
+
+      setProcessingId(demoId);
+
+      await api.patch(`/demo/${demoId}/assign`, {
+        mentorId,
+        slotId,
+      });
+
+      toast.success("Mentor assigned successfully");
+
+      // Clear selection for this demo
+      setSelectedMentorId((prev) => {
+        const next = { ...prev };
+        delete next[demoId];
+        return next;
+      });
+      setSelectedSlotId((prev) => {
+        const next = { ...prev };
+        delete next[demoId];
+        return next;
+      });
+
+      loadDemos();
+    } catch (error) {
+      console.error("Failed to assign mentor:", error);
+      toast.error("Failed to assign mentor");
+    } finally {
+      setProcessingId(null);
+    }
+  };
   const pendingCount = demos.filter(d => d.status === "pending").length;
   const acceptedCount = demos.filter(d => d.status === "accepted").length;
 
@@ -210,7 +404,9 @@ export default function AdminDemoPage() {
             >
               <option value="">All Statuses</option>
               <option value="pending">Pending</option>
-              <option value="accepted">Accepted</option>
+              <option value="accepted">Assigned</option>
+              <option value="mentor_accepted">Mentor Accepted</option>
+              <option value="mentor_rejected">Mentor Rejected</option>
             </select>
 
             <input
@@ -265,14 +461,35 @@ export default function AdminDemoPage() {
                   </div>
                   <div>
                     <p className="text-sm font-black text-slate-800 tracking-tight">{d.name}</p>
-                    <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                      d.status === 'accepted' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                      d.status === 'rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                      'bg-amber-50 text-amber-600 border-amber-100'
-                    }`}>
-                      {d.status === "accepted" ? <CheckCircle2 className="w-2.5 h-2.5"/> : <Clock className="w-2.5 h-2.5"/>}
-                      {d.status}
-                    </span>
+                   <span
+  className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+    d.mentorStatus === "accepted"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+      : d.mentorStatus === "rejected"
+      ? "bg-rose-50 text-rose-600 border-rose-100"
+      : d.status === "accepted"
+      ? "bg-blue-50 text-blue-600 border-blue-100"
+      : "bg-amber-50 text-amber-600 border-amber-100"
+  }`}
+>
+  {d.mentorStatus === "accepted" ? (
+    <CheckCircle2 className="w-2.5 h-2.5" />
+  ) : d.mentorStatus === "rejected" ? (
+    <Clock className="w-2.5 h-2.5" />
+  ) : d.status === "accepted" ? (
+    <CheckCircle2 className="w-2.5 h-2.5" />
+  ) : (
+    <Clock className="w-2.5 h-2.5" />
+  )}
+
+  {d.mentorStatus === "accepted"
+    ? "Mentor Accepted"
+    : d.mentorStatus === "rejected"
+    ? "Mentor Rejected"
+    : d.status === "accepted"
+    ? "Assigned"
+    : d.status}
+</span>
                   </div>
                 </div>
                 <div className="text-[10px] font-black text-slate-400 flex items-center gap-1 mt-1">
@@ -289,10 +506,20 @@ export default function AdminDemoPage() {
                     <Mail className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     <span className="break-all">{d.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                    <span>{d.phone}</span>
-                  </div>
+                 {d.mentorStatus === "accepted" ? (
+  <div
+    onClick={() => openWhatsApp(d)}
+    className="flex items-center gap-2 text-green-600 text-xs font-medium cursor-pointer hover:underline"
+  >
+    <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+    <span>{d.phone}</span>
+  </div>
+) : (
+  <div className="flex items-center gap-2 text-slate-400 text-xs font-medium">
+    <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+    <span>{d.phone}</span>
+  </div>
+)}
                 </div>
 
                 {/* Academic tags */}
@@ -313,24 +540,115 @@ export default function AdminDemoPage() {
 
                 {/* Action */}
                 <div className="mt-auto pt-4 border-t border-slate-50">
-                  {d.status === "pending" ? (
+                {d.status === "pending" ? (
+                  <div className="space-y-4">
+                    {/* Mentor Dropdown */}
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        Available Mentor
+                      </label>
+                      {loadingMentors ? (
+                        <div className="flex items-center gap-2 w-full bg-slate-50 border border-slate-100 px-3 py-3 rounded-2xl text-xs font-bold text-slate-400">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                          <span>Loading mentors...</span>
+                        </div>
+                      ) : (
+                        <select
+                          value={selectedMentorId[d._id] || ""}
+                          onChange={(e) => handleMentorChange(d._id, e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-100 px-3 py-3 rounded-2xl text-xs font-bold focus:bg-white focus:border-indigo-600 outline-none transition-all cursor-pointer"
+                        >
+                          <option value="">Select Mentor</option>
+                          {mentors.map((mentor) => (
+                            <option key={mentor._id} value={mentor._id}>
+                              {mentor.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+
+                    {/* Slot Dropdown */}
+                    {selectedMentorId[d._id] && (
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          Select Available Slot
+                        </label>
+                        {loadingSlots[selectedMentorId[d._id]] ? (
+                          <div className="flex items-center gap-2 w-full bg-slate-50 border border-slate-100 px-3 py-3 rounded-2xl text-xs font-bold text-slate-400">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                            <span>Loading slots...</span>
+                          </div>
+                        ) : !slots[selectedMentorId[d._id]] || slots[selectedMentorId[d._id]].length === 0 ? (
+                          <select
+                            disabled
+                            className="w-full bg-slate-50 border border-slate-100 px-3 py-3 rounded-2xl text-xs font-bold text-rose-500/80 outline-none cursor-not-allowed"
+                          >
+                            <option>No available slots</option>
+                          </select>
+                        ) : (
+                          <select
+                            value={selectedSlotId[d._id] || ""}
+                            onChange={(e) =>
+                              setSelectedSlotId((prev) => ({
+                                ...prev,
+                                [d._id]: e.target.value,
+                              }))
+                            }
+                            className="w-full bg-slate-50 border border-slate-100 px-3 py-3 rounded-2xl text-xs font-bold focus:bg-white focus:border-indigo-600 outline-none transition-all cursor-pointer"
+                          >
+                            <option value="">Select Slot</option>
+                            {slots[selectedMentorId[d._id]].map((slot) => (
+                              <option key={slot._id} value={slot._id}>
+                                {formatSlotLabel(slot)}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action Button */}
                     <button
-                      onClick={() => confirmAccept(d._id, d.name)}
-                      disabled={processingId === d._id}
-                      className="w-full py-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-100 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      onClick={() => assignMentor(d._id)}
+                      disabled={!selectedMentorId[d._id] || !selectedSlotId[d._id] || processingId === d._id}
+                      className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700 active:scale-[0.98] flex items-center justify-center gap-2"
                     >
                       {processingId === d._id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Assigning...
+                        </>
                       ) : (
-                        <CheckCircle className="w-3.5 h-3.5" />
+                        "Assign Mentor"
                       )}
-                      Accept Request
                     </button>
-                  ) : (
-                    <div className="text-center text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                      — Processed —
-                    </div>
-                  )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {d.assignedMentor && (
+                      <div className="flex items-center gap-2 justify-center">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mentor:</span>
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{d.assignedMentor.name}</span>
+                      </div>
+                    )}
+                    <div
+  className={`text-center text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border ${
+    d.mentorStatus === "accepted"
+      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+      : d.mentorStatus === "rejected"
+      ? "bg-rose-50 text-rose-600 border-rose-100"
+      : "bg-blue-50 text-blue-600 border-blue-100"
+  }`}
+>
+  {d.mentorStatus === "accepted"
+    ? "✅ Mentor Accepted"
+    : d.mentorStatus === "rejected"
+    ? "❌ Mentor Rejected"
+    : "📋 Assigned — Awaiting Mentor"}
+</div>
+                  </div>
+                )}
                 </div>
               </div>
             </div>
