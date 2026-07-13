@@ -104,6 +104,23 @@ export default function MentorAttendancePage() {
   const totalAttendance = filteredSlots.filter(s => 
     s.mentorAttendance === true && s.studentAttendance === true
   ).length;
+  const groupedAttendance = filteredSlots.reduce((acc, slot) => {
+  const date = new Date(slot.date);
+
+  const monthYear = date.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  if (!acc[monthYear]) {
+    acc[monthYear] = [];
+  }
+
+  acc[monthYear].push(slot);
+
+  return acc;
+
+}, {} as Record<string, Booking[]>);
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-5">
@@ -217,8 +234,28 @@ export default function MentorAttendancePage() {
               No attendance records discovered for the selected configuration.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {filteredSlots.map((slot) => (
+            <div className="space-y-8">
+
+{Object.entries(groupedAttendance).map(([month, monthSlots]) => (
+
+<div key={month}>
+
+<div className="flex items-center justify-between mb-4">
+
+<h2 className="font-black text-gray-800">
+📅 {month}
+</h2>
+
+<span className="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+Total {monthSlots.length} Bookings
+</span>
+
+</div>
+
+
+<div className="grid grid-cols-1 gap-4">
+
+{monthSlots.map((slot) => (
                 <div key={slot._id} className="bg-white border border-gray-100 p-5 rounded-[24px] shadow-sm flex items-center justify-between gap-4 hover:shadow-md transition-shadow">
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100">
@@ -246,8 +283,15 @@ export default function MentorAttendancePage() {
                       </div>
                    </div>
                 </div>
-              ))}
+                           ))}
+
             </div>
+
+          </div>
+
+        ))}
+
+      </div>
           )}
         </div>
       )}

@@ -14,12 +14,19 @@ import {
 import toast from "react-hot-toast";
 
 export default function OnboardingForm() {
-  const [syllabus, setSyllabus] = useState("");
+  const [syllabuses, setSyllabuses] = useState<string[]>([]);
   const [classLevel, setClassLevel] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [experience, setExperience] = useState("");
+
+  const toggleSyllabus = (s: string) => {
+    setSyllabuses((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
+    );
+    setSubjects([]);
+  };
 
   const toggleClassLevel = (c: string) => {
     setClassLevel((prev) =>
@@ -27,25 +34,30 @@ export default function OnboardingForm() {
     );
   };
 
-  // fetch ALL subjects by syllabus
+  // fetch ALL subjects by all selected syllabuses (merged, deduped)
   useEffect(() => {
-  if (!syllabus) return;
+    if (syllabuses.length === 0) {
+      setAvailableSubjects([]);
+      return;
+    }
 
-  api
-    .get(`/mentors/subjects?syllabus=${syllabus}`)
-    .then((res) => {
-      const subjects = res.data.subjects || res.data.data || [];
-
-      const normalized = subjects.map((s: any) =>
-        typeof s === "string" ? s : s.subject || s.name || s.title
-      );
-
-      setAvailableSubjects(normalized);
-    })
-    .catch(() => {
-      toast.error("Failed to load subjects");
+    Promise.all(
+      syllabuses.map((syl) =>
+        api
+          .get(`/mentors/subjects?syllabus=${syl}`)
+          .then((res) => {
+            const data = res.data.subjects || res.data.data || [];
+            return data.map((s: any) =>
+              typeof s === "string" ? s : s.subject || s.name || s.title
+            ) as string[];
+          })
+          .catch(() => [] as string[])
+      )
+    ).then((arrays) => {
+      const merged = Array.from(new Set(arrays.flat()));
+      setAvailableSubjects(merged);
     });
-}, [syllabus]);
+  }, [syllabuses]);
 
 
   const toggleSubject = (s: string) => {
@@ -58,7 +70,7 @@ export default function OnboardingForm() {
 
   const submit = async () => {
     if (
-      !syllabus ||
+      syllabuses.length === 0 ||
       classLevel.length === 0 ||
       subjects.length === 0 ||
       !experience
@@ -69,15 +81,20 @@ export default function OnboardingForm() {
     setSubmitting(true);
     try {
      await api.post("/mentors/onboarding", {
-  syllabus,
+  syllabus: syllabuses,
   classes: classLevel,
   subjects,
   experience,
 });
 
 
-      toast.success("Onboarding complete!");
-      setTimeout(() => window.location.reload(), 1000);
+     toast.success("🎉 Onboarding Completed Successfully!", {
+  duration: 3000,
+});
+
+setTimeout(() => {
+  window.location.reload();
+}, 3000);
     } catch {
       toast.error("Submission failed. Please try again.");
     } finally {
@@ -108,7 +125,7 @@ export default function OnboardingForm() {
         <div className="bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-slate-100/80 overflow-hidden">
           <div className="divide-y divide-slate-50">
 
-            {/* SYLLABUS SECTION */}
+            {/* SYLLABUS SECTION — Multi-Select */}
             <div className="p-8 group text-left">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-indigo-50 rounded-xl text-indigo-600 border border-indigo-100/50 flex items-center justify-center shadow-sm">
@@ -116,35 +133,52 @@ export default function OnboardingForm() {
                 </div>
                 <div>
                   <h2 className="text-lg font-black text-slate-800 tracking-tight">Academic Board</h2>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Your area of expertise</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Select one or both boards</p>
                 </div>
               </div>
 
+              {/* Selected chips */}
+              {syllabuses.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {syllabuses.map((s) => (
+                    <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-xs font-black border border-primary/20">
+                    {s === "Kerala State" ? "🌴 Kerala State" : "🏛️ CBSE Board"}
+                      <button
+                        type="button"
+                        onClick={() => toggleSyllabus(s)}
+                        className="ml-0.5 hover:text-red-500 transition-colors font-black"
+                        aria-label={`Remove ${s}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: "kerala", label: "Kerala State", icon: "🌴" },
-                  { id: "cbse", label: "CBSE Board", icon: "🏛️" }
-                ].map((s) => (
+  { id: "Kerala State", label: "Kerala State", icon: "🌴" },
+  { id: "CBSE", label: "CBSE Board", icon: "🏛️" }
+].map((s) => (
                   <button
                     key={s.id}
-                    onClick={() => {
-                      setSyllabus(s.id);
-                      setClassLevel([]);
-                      setSubjects([]);
-                    }}
-                    className={`relative p-5 rounded-[20px] border-2 text-left transition-all group overflow-hidden ${syllabus === s.id
-                      ? "border-primary bg-primary/[0.02] shadow-sm"
-                      : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/30"
-                      }`}
+                    type="button"
+                    onClick={() => toggleSyllabus(s.id)}
+                    className={`relative p-5 rounded-[20px] border-2 text-left transition-all group overflow-hidden ${
+                      syllabuses.includes(s.id)
+                        ? "border-primary bg-primary/[0.02] shadow-sm"
+                        : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/30"
+                    }`}
                   >
                     <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl grayscale group-hover:grayscale-0 transition-all">{s.icon}</span>
-                        <span className={`font-black tracking-tight ${syllabus === s.id ? "text-primary" : "text-slate-600"}`}>
+                        <span className={`font-black tracking-tight ${syllabuses.includes(s.id) ? "text-primary" : "text-slate-600"}`}>
                           {s.label}
                         </span>
                       </div>
-                      {syllabus === s.id && <CheckCircle2 className="w-5 h-5 text-primary" />}
+                      {syllabuses.includes(s.id) && <CheckCircle2 className="w-5 h-5 text-primary" />}
                     </div>
                   </button>
                 ))}
@@ -152,7 +186,7 @@ export default function OnboardingForm() {
             </div>
 
             {/* CLASS LEVEL SECTION */}
-            {syllabus && (
+            {syllabuses.length > 0 && (
               <div className="p-8 group animate-fade-in-up text-left">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-purple-50 rounded-xl text-purple-600 border border-purple-100/50 flex items-center justify-center shadow-sm">
@@ -182,7 +216,7 @@ export default function OnboardingForm() {
             )}
 
             {/* SUBJECTS SECTION */}
-            {syllabus && (
+            {syllabuses.length > 0 && (
               <div className="p-8 group animate-fade-in-up text-left">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">

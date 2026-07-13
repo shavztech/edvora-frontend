@@ -23,6 +23,7 @@ type DashboardData = {
 export default function MentorOnboardingPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -50,18 +51,19 @@ export default function MentorOnboardingPage() {
   }
 
   // ✅ ALREADY ONBOARDED → DETAILS ONLY
- if (data.isOnboarded && data.mentorOnboarding) {
+if (data.isOnboarded && data.mentorOnboarding && !isEditing) {
   return (
     <MentorOnboardingDetails
       data={{
         syllabus: data.mentorOnboarding.syllabus,
-        classLevels: data.mentorOnboarding.classes, // 🔥 MAIN FIX
+        classLevels: data.mentorOnboarding.classes,
         subjects: data.mentorOnboarding.subjects,
         experience: data.mentorOnboarding.experience,
       }}
+      onEdit={() => setIsEditing(true)}
     />
   );
-}     
+}
   // ❗ FIRST TIME ONLY  
   return <MentorOnboardingForm />;
 }

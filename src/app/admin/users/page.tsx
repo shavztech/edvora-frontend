@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
-import { User, Mail, Shield, ShieldAlert, Edit2, CheckCircle2, XCircle, Briefcase, MapPin, BookOpen, GraduationCap, Calendar, X, Search, AlertCircle } from "lucide-react";
+import { User, Mail, Shield, ShieldAlert, CheckCircle2, XCircle, Briefcase, MapPin, BookOpen, GraduationCap, Calendar, X, Search, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Modal from "@/components/Modal";
 
 const isStudentUnpaid = (student: any, allPayments: any[]) => {
   if (student.role !== "student") return false;
@@ -131,10 +132,13 @@ export default function AdminUsersPage() {
       } else if (selectedUser.role === "mentor") {
         const classes = editForm.mentorOnboarding?.classes || [];
         const sub = editForm.subjects || editForm.mentorOnboarding?.subjects || [];
+        // Ensure syllabus is always an array
+        const rawSyl = editForm.mentorOnboarding?.syllabus;
+        const syllabusArray = Array.isArray(rawSyl) ? rawSyl : rawSyl ? [rawSyl] : [];
         
         payload.subjects = sub;
         payload.mentorOnboarding = {
-          syllabus: editForm.mentorOnboarding?.syllabus || "",
+          syllabus: syllabusArray,
           experience: editForm.mentorOnboarding?.experience || "",
           classes: classes,
           subjects: sub
@@ -290,12 +294,45 @@ export default function AdminUsersPage() {
                 user={user} 
                 isUnpaid={activeTab === "student" && isStudentUnpaid(user, payments)}
                 onClick={() => openUserDetails(user._id)} 
+                onClickEdit={() => {
+                  setSelectedUser(user);
+                  setEditForm(user);
+                  setIsEditMode(true);
+                }}
               />
             ))
           )}
         </div>
       )}
 
+      {/* User Details / Edit Modal */}
+      <Modal isOpen={!!selectedUser && isEditMode} onClose={() => { setSelectedUser(null); setIsEditMode(false); }}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Edit Profile</h2>
+            <button onClick={() => { setSelectedUser(null); setIsEditMode(false); }} className="text-slate-400 hover:text-rose-500 transition-colors p-2 hover:bg-rose-50 rounded-xl">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <EditForm user={selectedUser} editForm={editForm} setEditForm={setEditForm} />
+          
+          <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-3">
+            <button 
+              onClick={() => { setSelectedUser(null); setIsEditMode(false); }}
+              className="px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSaveEdit}
+              className="px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20 hover:shadow-lg transition-all active:scale-95"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </Modal>
       
     </div>
   );
@@ -303,7 +340,7 @@ export default function AdminUsersPage() {
 
 // ---------------- Helper Components ----------------
 
-function UserCard({ user, isUnpaid, onClick }: { user: any, isUnpaid?: boolean, onClick: () => void }) {
+function UserCard({ user, isUnpaid, onClick, onClickEdit }: { user: any, isUnpaid?: boolean, onClick: () => void, onClickEdit?: () => void }) {
   return (
     <div 
       onClick={onClick}
@@ -336,9 +373,11 @@ function UserCard({ user, isUnpaid, onClick }: { user: any, isUnpaid?: boolean, 
       
       <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-400">
         <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/> {new Date(user.createdAt).toLocaleDateString()}</span>
-        <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 font-black text-[10px] uppercase tracking-widest">
-          View Profile &rarr;
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 font-black text-[10px] uppercase tracking-widest">
+            Profile &rarr;
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -379,11 +418,35 @@ function EditForm({ user, editForm, setEditForm }: { user: any, editForm: any, s
   
   const currentSyllabus = isStudent 
     ? editForm.syllabus || user.studentOnboarding?.syllabus || user.onboarding?.syllabus
-    : editForm.mentorOnboarding?.syllabus || user.mentorOnboarding?.syllabus;
+    : null; // mentors use array — handled separately
     
   const currentClass = isStudent 
     ? editForm.class || user.studentOnboarding?.class || user.onboarding?.class || user.studentOnboarding?.classLevel || user.onboarding?.classLevel
     : "";
+
+  // Mentor multi-syllabus: normalise to array from stored string or array
+  const mentorSyllabuses: string[] = !isStudent
+    ? Array.isArray(editForm.mentorOnboarding?.syllabus)
+      ? editForm.mentorOnboarding.syllabus
+      : editForm.mentorOnboarding?.syllabus
+        ? [editForm.mentorOnboarding.syllabus]
+        : Array.isArray(user.mentorOnboarding?.syllabus)
+          ? user.mentorOnboarding.syllabus
+          : user.mentorOnboarding?.syllabus
+            ? [user.mentorOnboarding.syllabus]
+            : []
+    : [];
+
+  const toggleMentorSyllabus = (s: string) => {
+    const current = Array.isArray(editForm.mentorOnboarding?.syllabus)
+      ? editForm.mentorOnboarding.syllabus
+      : editForm.mentorOnboarding?.syllabus ? [editForm.mentorOnboarding.syllabus] : [];
+    const updated = current.includes(s) ? current.filter((x: string) => x !== s) : [...current, s];
+    setEditForm({
+      ...editForm,
+      mentorOnboarding: { ...(editForm.mentorOnboarding || {}), syllabus: updated }
+    });
+  };
 
   useEffect(() => {
     if (user) {
@@ -406,12 +469,19 @@ function EditForm({ user, editForm, setEditForm }: { user: any, editForm: any, s
             setAllSubjects([]);
           }
         } else {
-          // Mentor subjects
-          if (currentSyllabus) {
-            const res = await api.get(`/mentors/subjects?syllabus=${currentSyllabus}`);
-            const fetched = res.data.subjects || res.data.data || [];
-            const normalized = fetched.map((s: any) => typeof s === "string" ? s : s.name || s.title || s.subject);
-            setAllSubjects(normalized);
+          // Mentor subjects — fetch for all selected syllabuses and merge
+          if (mentorSyllabuses.length > 0) {
+            const results = await Promise.all(
+              mentorSyllabuses.map((syl) =>
+                api.get(`/mentors/subjects?syllabus=${syl}`)
+                  .then((res) => {
+                    const fetched = res.data.subjects || res.data.data || [];
+                    return fetched.map((s: any) => typeof s === "string" ? s : s.name || s.title || s.subject);
+                  })
+                  .catch(() => [])
+              )
+            );
+            setAllSubjects(Array.from(new Set(results.flat())));
           } else {
             setAllSubjects([]);
           }
@@ -422,7 +492,8 @@ function EditForm({ user, editForm, setEditForm }: { user: any, editForm: any, s
       }
     };
     fetchSubjects();
-  }, [currentSyllabus, currentClass, isStudent]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSyllabus, currentClass, isStudent, JSON.stringify(mentorSyllabuses)]);
 
   const toggleClassLevel = (c: string) => {
     const currentClasses = editForm.mentorOnboarding?.classes || [];
@@ -572,17 +643,44 @@ function EditForm({ user, editForm, setEditForm }: { user: any, editForm: any, s
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5">Syllabus</label>
-            <select 
-              value={editForm.mentorOnboarding?.syllabus || ""} 
-              onChange={(e) => handleNestedChange("mentorOnboarding", "syllabus", e.target.value)}
-              className="w-full bg-white border border-slate-300 px-4 py-3 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
-            >
-              <option value="">Select</option>
-              <option value="kerala">Kerala</option>
-              <option value="cbse">CBSE</option>
-            </select>
+          <div className="col-span-full">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Syllabus (multi-select)</label>
+            {/* Selected chips */}
+            {mentorSyllabuses.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {mentorSyllabuses.map((s: string) => (
+                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-xs font-black border border-primary/20">
+                    {s === "kerala" ? "🌴 Kerala State" : "🏛️ CBSE Board"}
+                    <button
+                      type="button"
+                      onClick={() => toggleMentorSyllabus(s)}
+                      className="ml-0.5 hover:text-red-500 transition-colors font-black"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-3">
+              {[
+                { id: "kerala", label: "🌴 Kerala State" },
+                { id: "cbse", label: "🏛️ CBSE Board" }
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => toggleMentorSyllabus(opt.id)}
+                  className={`flex-1 px-4 py-3 rounded-2xl border-2 text-sm font-black transition-all ${
+                    mentorSyllabuses.includes(opt.id)
+                      ? "border-primary bg-primary/5 text-primary shadow-sm"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
           <div>
             <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5">Experience</label>

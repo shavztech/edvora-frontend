@@ -132,7 +132,26 @@ export default function AdminReportsPage() {
       r.student?.name?.toLowerCase().includes(term)
     );
   });
+ const groupedReports: Record<string, any[]> = filteredReports.reduce(
+  (acc: Record<string, any[]>, report: any) => {
 
+    const month = report.createdAt
+      ? new Date(report.createdAt).toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        })
+      : "Unknown Month";
+
+    if (!acc[month]) {
+      acc[month] = [];
+    }
+
+    acc[month].push(report);
+
+    return acc;
+  },
+  {}
+);
   return (
     <div className="w-full max-w-full overflow-x-hidden">
     <div className="max-w-6xl mx-auto p-3 sm:p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-up">
@@ -236,8 +255,29 @@ export default function AdminReportsPage() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          {filteredReports.map((r) => (
+       <div className="space-y-10">
+
+{Object.entries(groupedReports).map(
+([month, monthReports]) => (
+
+<div key={month}>
+
+<div className="flex items-center justify-between mb-5">
+
+<h2 className="text-xl font-black text-slate-800">
+📅 {month}
+</h2>
+
+<span className="px-4 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+Total {monthReports.length} Reports
+</span>
+
+</div>
+
+
+<div className="flex flex-col gap-4">
+
+{monthReports.map((r) => (
             <div
               key={r._id}
               className={`group bg-white rounded-[24px] border transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 overflow-hidden ${
@@ -256,6 +296,13 @@ export default function AdminReportsPage() {
                     <User className="w-3.5 h-3.5" />
                     <span className="text-[10px] font-black uppercase tracking-widest">{r.student?.name}</span>
                   </div>
+                  <div className="flex items-center gap-2 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-xl border border-purple-100">
+  <User className="w-3.5 h-3.5" />
+
+  <span className="text-[10px] font-black uppercase tracking-widest">
+    Mentor: {r.mentor?.name || "Not Assigned"}
+  </span>
+</div>
                   <div className="flex items-center gap-2 bg-slate-50 text-slate-500 px-3 py-1.5 rounded-xl border border-slate-100">
                     <Mail className="w-3.5 h-3.5" />
                     <span className="text-[10px] font-medium break-all">{r.student?.email}</span>
@@ -278,6 +325,32 @@ export default function AdminReportsPage() {
                 <p className="text-slate-600 text-sm leading-relaxed bg-slate-50/80 p-4 rounded-2xl border border-slate-100 italic">
                   "{r.message}"
                 </p>
+                {/* Mentor Response */}
+{r.response && (
+  <div className="mt-4 bg-green-50 border border-green-100 rounded-2xl p-4">
+
+    <div className="flex items-center gap-2 mb-2">
+      <CheckCircle2 className="w-4 h-4 text-green-600" />
+
+      <p className="text-[10px] font-black text-green-700 uppercase tracking-widest">
+        Mentor Response
+      </p>
+    </div>
+
+
+    <p className="text-sm font-semibold text-slate-700">
+      {r.response}
+    </p>
+
+
+    {r.respondedAt && (
+      <p className="text-[10px] text-slate-400 mt-2 font-bold">
+        Responded : {new Date(r.respondedAt).toLocaleString()}
+      </p>
+    )}
+
+  </div>
+)}
 
                 {/* Footer Row */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-50">
@@ -314,8 +387,15 @@ export default function AdminReportsPage() {
                 </div>
               </div>
             </div>
-          ))}
+                   ))}
+
         </div>
+
+      </div>
+
+    ))}
+
+</div>
       )}
     </div>
     </div>

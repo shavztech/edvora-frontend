@@ -328,7 +328,27 @@ Edvora Team 💙`;
       d.subject?.toLowerCase().includes(term)
     );
   });
+ const groupedDemos: Record<string, DemoRequest[]> =
+  filteredDemos.reduce(
+    (acc: Record<string, DemoRequest[]>, demo) => {
 
+      const month = demo.createdAt
+        ? new Date(demo.createdAt).toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          })
+        : "Unknown Month";
+
+      if (!acc[month]) {
+        acc[month] = [];
+      }
+
+      acc[month].push(demo);
+
+      return acc;
+    },
+    {}
+  );
   if (loading && demos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -437,8 +457,30 @@ Edvora Team 💙`;
           <p className="text-slate-400 text-sm max-w-xs mx-auto">No demo requests match your current filters.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-          {filteredDemos.map((d) => (
+        <div className="space-y-10">
+
+{Object.entries(groupedDemos).map(
+([month, monthDemos]) => (
+
+<div key={month}>
+
+<div className="flex items-center justify-between mb-5">
+
+<h2 className="text-xl font-black text-slate-800">
+📅 {month}
+</h2>
+
+<span className="px-4 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+Total {monthDemos.length} Demo Requests
+</span>
+
+</div>
+
+
+<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+
+
+{monthDemos.map((d) => (
             <div
               key={d._id}
               className={`bg-white rounded-[24px] border transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 flex flex-col overflow-hidden ${
@@ -651,9 +693,16 @@ Edvora Team 💙`;
                 )}
                 </div>
               </div>
-            </div>
+                       </div>
           ))}
+
         </div>
+
+      </div>
+
+    ))}
+
+</div>
       )}
     </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import {
   Loader2,
@@ -23,6 +24,7 @@ import {
 import toast from "react-hot-toast";
 
 export default function AdminPaymentsPage() {
+  const router = useRouter();
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<string | null>(null);
@@ -173,7 +175,28 @@ useEffect(() => {
       </span>
     );
   };
+const groupedPayments: Record<string, any[]> = payments.reduce(
+  (acc: Record<string, any[]>, payment: any) => {
 
+    const month =
+      payment.month ||
+      (payment.createdAt
+        ? new Date(payment.createdAt).toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          })
+        : "Unknown Month");
+
+    if (!acc[month]) {
+      acc[month] = [];
+    }
+
+    acc[month].push(payment);
+
+    return acc;
+  },
+  {}
+);
   if (loading && payments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -284,8 +307,30 @@ useEffect(() => {
           <p className="text-slate-400 text-sm max-w-xs mx-auto">The payment ledger is currently empty. No transactions have been logged yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-          {payments.map((p) => (
+      <div className="space-y-10">
+
+{Object.entries(groupedPayments).map(
+([month, monthPayments]) => (
+
+<div key={month}>
+
+<div className="flex items-center justify-between mb-5">
+
+<h2 className="text-xl font-black text-slate-800">
+💰 {month}
+</h2>
+
+<span className="px-4 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+Total {monthPayments.length} Payments
+</span>
+
+</div>
+
+
+<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+
+
+{monthPayments.map((p) => (
             <div
               key={p._id}
               className="bg-white rounded-[24px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-500 flex flex-col"
@@ -297,7 +342,12 @@ useEffect(() => {
                     {p.student?.name?.[0]?.toUpperCase() || "?"}
                   </div>
                   <div>
-                    <p className="text-sm font-black text-slate-800 tracking-tight">{p.student?.name || "Unknown"}</p>
+                  <p
+  onClick={() => router.push(`/admin/users/${p.student?._id}`)}
+  className="text-sm font-black text-blue-600 tracking-tight cursor-pointer hover:underline"
+>
+  {p.student?.name || "Unknown"}
+</p>
                     <p className="text-[10px] text-slate-400 font-medium break-all">{p.student?.email}</p>
                   </div>
                 </div>
@@ -366,11 +416,20 @@ useEffect(() => {
                     — Processed —
                   </div>
                 )}
-              </div>
+                           </div>
             </div>
           ))}
+
         </div>
+
+      </div>
+
+    ))}
+
+</div>
       )}
+
+      
 
       {/* ══ IMAGE PREVIEW MODAL ══ */}
       {preview && (

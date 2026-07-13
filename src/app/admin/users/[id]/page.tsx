@@ -9,7 +9,7 @@ import {
   CheckCircle2, XCircle, AlertTriangle, Activity, TrendingUp,
   CreditCard, Search, Star, Briefcase,
   GraduationCap, Users, Video, BarChart2, Lock, Unlock, Loader2,
-  RefreshCw
+  RefreshCw, Edit2, Save, X
 } from "lucide-react";
 
 // ─────────────────── Types ───────────────────
@@ -139,6 +139,80 @@ export default function UserProfilePage() {
   const [bookingSearch, setBookingSearch] = useState("");
   const [paymentSearch, setPaymentSearch] = useState("");
   const [attendanceSearch, setAttendanceSearch] = useState("");
+
+  // ── Mentor Onboarding Edit State ──
+  const [editingOnboarding, setEditingOnboarding] = useState(false);
+  const [savingOnboarding, setSavingOnboarding] = useState(false);
+  const [editSyllabuses, setEditSyllabuses] = useState<string[]>([]);
+  const [editClasses, setEditClasses] = useState<string[]>([]);
+  const [editSubjects, setEditSubjects] = useState<string[]>([]);
+  const [editExperience, setEditExperience] = useState("");
+  const [allSubjects, setAllSubjects] = useState<string[]>([]);
+
+  const initOnboardingEdit = () => {
+    if (!baseUser) return;
+    const mo = baseUser.mentorOnboarding || {};
+    const syl = Array.isArray(mo.syllabus) ? mo.syllabus : mo.syllabus ? [mo.syllabus] : [];
+    setEditSyllabuses(syl);
+    setEditClasses(mo.classes || []);
+    setEditSubjects(mo.subjects || []);
+    setEditExperience(mo.experience || "");
+    setEditingOnboarding(true);
+  };
+
+  const toggleEditSyllabus = (s: string) => {
+    setEditSyllabuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+    setEditSubjects([]);
+  };
+
+  const toggleEditClass = (c: string) => {
+    setEditClasses(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
+  };
+
+  const toggleEditSubject = (s: string) => {
+    setEditSubjects(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  // Fetch subjects when editing syllabuses change
+  useEffect(() => {
+    if (!editingOnboarding || editSyllabuses.length === 0) {
+      setAllSubjects([]);
+      return;
+    }
+    Promise.all(
+      editSyllabuses.map(syl =>
+        api.get(`/mentors/subjects?syllabus=${syl}`)
+          .then(res => {
+            const fetched = res.data.subjects || res.data.data || [];
+            return fetched.map((s: any) => typeof s === "string" ? s : s.name || s.title || s.subject);
+          })
+          .catch(() => [] as string[])
+      )
+    ).then(results => setAllSubjects(Array.from(new Set(results.flat()))));
+  }, [editingOnboarding, editSyllabuses]);
+
+  const handleSaveOnboarding = async () => {
+    setSavingOnboarding(true);
+    try {
+      await api.put(`/admin/users/${id}`, {
+        name: baseUser.name,
+        subjects: editSubjects,
+        mentorOnboarding: {
+          syllabus: editSyllabuses,
+          classes: editClasses,
+          subjects: editSubjects,
+          experience: editExperience,
+        },
+      });
+      toast.success("Mentor onboarding updated!");
+      setEditingOnboarding(false);
+      load();
+    } catch {
+      toast.error("Failed to update onboarding");
+    } finally {
+      setSavingOnboarding(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -324,29 +398,129 @@ export default function UserProfilePage() {
           </Section>
 
           {/* Onboarding */}
-          <Section
-            title={isStudent ? "Student Onboarding" : "Mentor Onboarding"}
-            icon={<GraduationCap className="w-4 h-4" />}
-          >
-            {isStudent ? (
-              <div>
-                <InfoRow label="Class" value={u.studentOnboarding?.class ?? u.onboarding?.class ?? u.classLevel} />
-                <InfoRow label="Syllabus" value={u.studentOnboarding?.syllabus ?? u.onboarding?.syllabus ?? u.syllabus} />
-                <InfoRow label="Course Type" value={u.studentOnboarding?.courseType ?? u.onboarding?.courseType ?? u.courseType} />
-                <InfoRow label="Subjects" value={(u.studentOnboarding?.subjects ?? u.onboarding?.subjects ?? u.subjects ?? []).join(", ") || null} />
-                <InfoRow label="Onboarding" value={u.onboardingCompleted ? "✅ Completed" : "⏳ Pending"} />
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/60">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"><GraduationCap className="w-4 h-4" /></div>
+                <h2 className="text-sm font-black text-slate-700 uppercase tracking-widest">{isStudent ? "Student Onboarding" : "Mentor Onboarding"}</h2>
               </div>
-            ) : (
-              <div>
-                <InfoRow label="Syllabus" value={u.mentorOnboarding?.syllabus} />
-                <InfoRow label="Classes" value={(u.mentorOnboarding?.classes ?? []).join(", ") || null} />
-                <InfoRow label="Subjects" value={(u.mentorOnboarding?.subjects ?? []).join(", ") || null} />
-                <InfoRow label="Experience" value={u.mentorOnboarding?.experience} />
-                <InfoRow label="Bio" value={u.mentorOnboarding?.bio} />
-                <InfoRow label="Onboarding" value={u.isOnboarded ? "✅ Completed" : "⏳ Pending"} />
-              </div>
-            )}
-          </Section>
+              {!isStudent && !editingOnboarding && (
+                <button onClick={initOnboardingEdit} className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 rounded-xl transition-colors">
+                  <Edit2 className="w-3 h-3" /> Edit
+                </button>
+              )}
+            </div>
+            <div className="p-6">
+              {isStudent ? (
+                <div>
+                  <InfoRow label="Class" value={u.studentOnboarding?.class ?? u.onboarding?.class ?? u.classLevel} />
+                  <InfoRow label="Syllabus" value={u.studentOnboarding?.syllabus ?? u.onboarding?.syllabus ?? u.syllabus} />
+                  <InfoRow label="Course Type" value={u.studentOnboarding?.courseType ?? u.onboarding?.courseType ?? u.courseType} />
+                  <InfoRow label="Subjects" value={(u.studentOnboarding?.subjects ?? u.onboarding?.subjects ?? u.subjects ?? []).join(", ") || null} />
+                  <InfoRow label="Onboarding" value={u.onboardingCompleted ? "✅ Completed" : "⏳ Pending"} />
+                </div>
+              ) : editingOnboarding ? (
+                <div className="space-y-5 animate-fade-in">
+                  {/* Syllabus multi-select */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Syllabus (multi-select)</label>
+                    {editSyllabuses.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {editSyllabuses.map(s => (
+                          <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black border border-indigo-100">
+                            {s === "kerala state" ? "🌴 Kerala" : "🏛️ CBSE"}
+                            <button type="button" onClick={() => toggleEditSyllabus(s)} className="ml-0.5 hover:text-rose-500 transition-colors">×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      {[{ id: "kerala state", label: "🌴 Kerala" }, { id: "cbse", label: "🏛️ CBSE" }].map(opt => (
+                        <button key={opt.id} type="button" onClick={() => toggleEditSyllabus(opt.id)}
+                          className={`flex-1 px-4 py-3 rounded-2xl border-2 text-sm font-black transition-all ${
+                            editSyllabuses.includes(opt.id)
+                              ? "border-indigo-500 bg-indigo-50 text-indigo-600 shadow-sm"
+                              : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                          }`}>{opt.label}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Experience */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Experience</label>
+                    <select value={editExperience} onChange={e => setEditExperience(e.target.value)}
+                      className="w-full bg-white border border-slate-300 px-4 py-3 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all">
+                      <option value="">Select</option>
+                      <option value="0-1 years">0-1 years</option>
+                      <option value="1-3 years">1-3 years</option>
+                      <option value="3-5 years">3-5 years</option>
+                      <option value="5+ years">5+ years</option>
+                    </select>
+                  </div>
+
+                  {/* Classes multi-select */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Classes</label>
+                    <div className="grid grid-cols-4 gap-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-200/60">
+                      {["KG","1","2","3","4","5","6","7","8","9","10","11","12"].map(c => (
+                        <button key={c} type="button" onClick={() => toggleEditClass(c)}
+                          className={`p-2.5 rounded-xl border font-bold text-xs transition-all ${
+                            editClasses.includes(c)
+                              ? "border-indigo-500 bg-indigo-500 text-white shadow-md shadow-indigo-200"
+                              : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                          }`}>{c}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Subjects multi-select */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Subjects</label>
+                    <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/60 max-h-48 overflow-y-auto">
+                      {editSyllabuses.length === 0 ? (
+                        <span className="text-xs font-bold text-slate-400 col-span-full text-center py-4">Select a syllabus first</span>
+                      ) : allSubjects.length > 0 ? (
+                        allSubjects.map(sub => (
+                          <label key={sub} className={`flex items-center gap-2 text-sm font-bold cursor-pointer p-2.5 rounded-xl border transition-all ${
+                            editSubjects.includes(sub) ? "bg-white border-indigo-400 shadow-sm text-indigo-600" : "bg-white border-transparent hover:border-slate-200 text-slate-700"
+                          }`}>
+                            <input type="checkbox" checked={editSubjects.includes(sub)} onChange={() => toggleEditSubject(sub)}
+                              className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-300" />
+                            <span className="truncate">{sub}</span>
+                          </label>
+                        ))
+                      ) : (
+                        <span className="text-xs font-bold text-slate-400 col-span-full text-center py-4">No subjects found</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Save / Cancel */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <button onClick={handleSaveOnboarding} disabled={savingOnboarding}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all disabled:opacity-60">
+                      {savingOnboarding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      Save
+                    </button>
+                    <button onClick={() => setEditingOnboarding(false)}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest transition-all">
+                      <X className="w-3.5 h-3.5" /> Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <InfoRow label="Syllabus" value={Array.isArray(u.mentorOnboarding?.syllabus) ? u.mentorOnboarding.syllabus.join(", ") : u.mentorOnboarding?.syllabus} />
+                  <InfoRow label="Classes" value={(u.mentorOnboarding?.classes ?? []).join(", ") || null} />
+                  <InfoRow label="Subjects" value={(u.mentorOnboarding?.subjects ?? []).join(", ") || null} />
+                  <InfoRow label="Experience" value={u.mentorOnboarding?.experience} />
+                  <InfoRow label="Bio" value={u.mentorOnboarding?.bio} />
+                  <InfoRow label="Onboarding" value={u.isOnboarded ? "✅ Completed" : "⏳ Pending"} />
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Account Status */}
           <Section title="Account Status" icon={<Shield className="w-4 h-4" />}>
@@ -469,12 +643,6 @@ export default function UserProfilePage() {
                     </div>
                     <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                       <span className={badgeCls(b.status)}>{b.status}</span>
-                      {b.meetLink && (
-                        <a href={b.meetLink} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-colors">
-                          <Video className="w-3 h-3" /> Meet
-                        </a>
-                      )}
                     </div>
                   </div>
                 ))}

@@ -292,7 +292,33 @@ const canEdit = (createdAt: string) => {
                     <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap flex-grow">
                       {r.message}
                     </p>
+                    {r.response && (
+  <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-4">
 
+    <div className="flex items-center gap-2 mb-2">
+
+      <MessageSquare className="w-4 h-4 text-green-600" />
+
+      <p className="text-xs font-black text-green-700 uppercase tracking-widest">
+        Mentor Response
+      </p>
+
+    </div>
+
+    <p className="text-sm font-medium text-gray-700">
+      {r.response}
+    </p>
+
+
+    {r.respondedAt && (
+      <p className="text-[10px] text-gray-400 mt-2 font-bold">
+        Responded: {" "}
+        {new Date(r.respondedAt).toLocaleString()}
+      </p>
+    )}
+
+  </div>
+)}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-5 pt-4 border-t border-gray-50">
                       <div className="flex items-center gap-1.5 text-gray-400 bg-gray-50 px-2.5 py-1.5 rounded-lg w-fit">
                         <Clock className="w-3.5 h-3.5" />

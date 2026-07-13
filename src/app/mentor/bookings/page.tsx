@@ -195,6 +195,22 @@ export default function MentorBookingsPage() {
   }
 
   const pathname = usePathname();
+  const groupedBookings = bookings.reduce((acc, booking) => {
+  const date = new Date(booking.date);
+
+  const monthYear = date.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  if (!acc[monthYear]) {
+    acc[monthYear] = [];
+  }
+
+  acc[monthYear].push(booking);
+
+  return acc;
+}, {} as Record<string, Booking[]>);
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
@@ -348,16 +364,34 @@ export default function MentorBookingsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
-          {bookings.map((booking) => {
-            const today = new Date().toISOString().split('T')[0];
-            const isExpired = today > booking.date;
+       <div className="space-y-10 pb-10">
 
-            const statusColors = {
-              pending: "bg-amber-50 text-amber-600 border-amber-100",
-              accepted: isExpired ? "bg-slate-50 text-slate-500 border-slate-200" : "bg-green-50 text-green-600 border-green-100",
-              rejected: "bg-red-50 text-red-600 border-red-100"
-            };
+  {Object.entries(groupedBookings).map(([month, monthBookings]) => (
+
+    <div key={month}>
+
+      <h2 className="text-xl font-black text-slate-800 mb-5 flex items-center gap-2">
+        📅 {month}
+
+        <span className="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+          {monthBookings.length}
+        </span>
+      </h2>
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        {monthBookings.map((booking) => {
+          const today = new Date().toISOString().split("T")[0];
+          const isExpired = today > booking.date;
+
+          const statusColors = {
+            pending: "bg-amber-50 text-amber-600 border-amber-100",
+            accepted: isExpired
+              ? "bg-slate-50 text-slate-500 border-slate-200"
+              : "bg-green-50 text-green-600 border-green-100",
+            rejected: "bg-red-50 text-red-600 border-red-100",
+          };
 
             return (
               <div key={booking._id}
@@ -500,8 +534,14 @@ export default function MentorBookingsPage() {
                 )}
               </div>
             );
-          })}
+                   })}
+
         </div>
+      </div>
+
+    ))}
+
+</div>
       )}
       </div>
     </div>

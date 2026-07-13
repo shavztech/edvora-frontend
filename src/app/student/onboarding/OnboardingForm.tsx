@@ -20,6 +20,7 @@ export default function OnboardingForm() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [courseType, setCourseType] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -48,16 +49,19 @@ export default function OnboardingForm() {
     setSubmitting(true);
     try {
       await api.post("/students/onboarding", {
-        syllabus,
-        classLevel,
-        subjects,
-        courseType,
-      });
+  syllabus,
+  classLevel,
+  subjects,
+  courseType,
+  phone,
+});
+toast.success("🎉 Onboarding Completed Successfully!", {
+  duration: 3000,
+});
 
-      toast.success("Onboarding complete!");
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+setTimeout(() => {
+  window.location.reload();
+}, 3000);
     } catch (error) {
       toast.error("Submission failed. Please try again.");
     } finally {
@@ -102,9 +106,9 @@ export default function OnboardingForm() {
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: "kerala", label: "Kerala State", icon: "🌴" },
-                  { id: "cbse", label: "CBSE Board", icon: "🏛️" }
-                ].map((s) => (
+  { id: "Kerala State", label: "Kerala State", icon: "🌴" },
+  { id: "CBSE", label: "CBSE Board", icon: "🏛️" }
+].map((s) => (
                   <button
                     key={s.id}
                     onClick={() => {
@@ -242,7 +246,19 @@ export default function OnboardingForm() {
                 </div>
               </div>
             )}
+            <div className="p-8 animate-fade-in-up">
+  <label className="block text-sm font-bold text-slate-700 mb-3">
+    Phone Number
+  </label>
 
+  <input
+    type="text"
+    value={phone}
+    onChange={(e) => setPhone(e.target.value)}
+    placeholder="Enter your phone number"
+    className="w-full h-12 rounded-xl border border-slate-300 px-4 outline-none focus:border-primary"
+  />
+</div>
             {/* SUBMIT SECTION */}
             <div className="p-8 bg-slate-50/50 border-t border-slate-100">
               <button

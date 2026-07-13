@@ -209,7 +209,27 @@ export default function MentorDemoRequestsPage() {
       d.subject?.toLowerCase().includes(term)
     );
   });
+const groupedDemos: Record<string, DemoRequest[]> =
+  filteredDemos.reduce(
+    (acc: Record<string, DemoRequest[]>, demo) => {
 
+      const month = demo.createdAt
+        ? new Date(demo.createdAt).toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          })
+        : "Unknown Month";
+
+      if (!acc[month]) {
+        acc[month] = [];
+      }
+
+      acc[month].push(demo);
+
+      return acc;
+    },
+    {}
+  );
   if (loading && demos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -291,8 +311,29 @@ export default function MentorDemoRequestsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
-            {filteredDemos.map((d) => {
+          <div className="space-y-10">
+
+{Object.entries(groupedDemos).map(
+([month, monthDemos]) => (
+
+<div key={month}>
+
+<div className="flex items-center justify-between mb-5">
+
+<h2 className="text-xl font-black text-slate-800">
+📅 {month}
+</h2>
+
+<span className="px-4 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+Total {monthDemos.length} Demo Requests
+</span>
+
+</div>
+
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
+
+{monthDemos.map((d) => {
               const isPending = !d.mentorStatus || d.mentorStatus === "pending";
              const isAccepted = d.mentorStatus === "accepted";
 const isRejected = d.mentorStatus === "rejected";
@@ -429,9 +470,16 @@ const isRejected = d.mentorStatus === "rejected";
 )}
                   </div>
                 </div>
-              );
+                            );
             })}
+
           </div>
+
+        </div>
+
+      ))}
+
+</div>
         )}
       </div>
     </div>

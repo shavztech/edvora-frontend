@@ -22,9 +22,13 @@ interface MentorOnboardingData {
 
 interface OnboardingDetailsProps {
   data: MentorOnboardingData;
+  onEdit: () => void;
 }
 
-export default function MentorOnboardingDetails({ data }: OnboardingDetailsProps) {
+export default function MentorOnboardingDetails({
+  data,
+  onEdit,
+}: OnboardingDetailsProps) {
   const { syllabus, classLevel, classLevels, classes, subjects, experience } = data;
 
 const displayClasses =
@@ -60,6 +64,12 @@ const displayClasses =
               Verified Expert
             </span>
           </div>
+          <button
+  onClick={onEdit}
+  className="mt-4 px-5 py-3 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition-all"
+>
+  ✏️ Edit Profile
+</button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">

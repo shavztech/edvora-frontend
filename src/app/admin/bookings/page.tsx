@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { 
   Calendar, 
@@ -63,6 +64,7 @@ const MONTHS = [
 const YEARS = ["2024", "2025", "2026"];
 
 export default function AdminBookingsPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -126,6 +128,17 @@ export default function AdminBookingsPage() {
   useEffect(() => {
     loadBookings();
   }, [filterDate, filterMonth, filterYear, filterAttendance, filterStatus]);
+  const groupedBookings = bookings.reduce((acc, booking) => {
+  const date = booking.date || "No Date";
+
+  if (!acc[date]) {
+    acc[date] = [];
+  }
+
+  acc[date].push(booking);
+
+  return acc;
+}, {} as Record<string, Booking[]>);
 
   if (loading && bookings.length === 0) {
     return (
@@ -265,8 +278,26 @@ export default function AdminBookingsPage() {
           <p className="text-gray-400 font-bold max-w-xs mx-auto">Try adjusting your filters to see historical booking data.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {bookings.map((booking) => (
+        <div className="space-y-10">
+
+{Object.entries(groupedBookings).map(([date, dayBookings]) => (
+
+<div key={date}>
+
+<div className="flex items-center gap-3 mb-5">
+  <h2 className="text-xl font-black text-gray-800">
+    📅 {date}
+  </h2>
+
+  <span className="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-black">
+    {dayBookings.length}
+  </span>
+</div>
+
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+{dayBookings.map((booking) => (
             <div 
               key={booking._id} 
               className="bg-white border border-gray-200 rounded-[24px] p-5 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col space-y-4"
@@ -280,9 +311,12 @@ export default function AdminBookingsPage() {
                         </div>
                         <div>
                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block leading-3">Student</span>
-                           <p className="text-sm font-black text-gray-800 tracking-tight">
-                              {booking.student?.name || "Unknown Student"}
-                           </p>
+                          <p
+  onClick={() => router.push(`/admin/users/${booking.student._id}`)}
+  className="text-sm font-black text-blue-600 tracking-tight cursor-pointer hover:underline"
+>
+  {booking.student?.name || "Unknown Student"}
+</p>
                         </div>
                      </div>
 
@@ -292,9 +326,12 @@ export default function AdminBookingsPage() {
                         </div>
                         <div>
                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block leading-3">Mentor</span>
-                           <p className="text-sm font-black text-gray-800 tracking-tight">
-                              {booking.mentor?.name || "Unknown Mentor"}
-                           </p>
+                          <p
+  onClick={() => router.push(`/admin/users/${booking.mentor._id}`)}
+  className="text-sm font-black text-purple-600 tracking-tight cursor-pointer hover:underline"
+>
+  {booking.mentor?.name || "Unknown Mentor"}
+</p>
                         </div>
                      </div>
                   </div>
@@ -332,14 +369,14 @@ export default function AdminBookingsPage() {
                      </div>
                   </div>
 
-                  {booking.meetLink && (
+                  {/* {booking.Link && (
                     <div className="bg-blue-50/50 px-4 py-2.5 rounded-2xl border border-blue-100 flex items-center justify-between">
                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Meet Link</span>
                        <a href={booking.meetLink} target="_blank" rel="noreferrer" className="text-[10px] font-black text-blue-600 hover:underline truncate max-w-[150px]">
                          {booking.meetLink}
                        </a>
                     </div>
-                  )}
+                  )} */}
                </div>
 
                <div className="mt-auto space-y-3">
@@ -409,14 +446,27 @@ export default function AdminBookingsPage() {
 
                   <div className="w-full border border-gray-100 rounded-xl py-2 px-4 flex items-center justify-between">
                      <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Audit Trail ID</span>
-                     <span className="text-[9px] font-bold text-gray-300 font-mono">#{booking._id.slice(-6)}</span>
+                    <span className="text-[9px] font-bold text-gray-300 font-mono">
+  #{booking._id.slice(-6)}
+</span>
+
                   </div>
+
                </div>
+
             </div>
           ))}
+
+        </div>
+
+      </div>
+
+    ))}
+
         </div>
       )}
+
     </div>
-    </div>
-  );
+  </div>
+);
 }
