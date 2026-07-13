@@ -20,6 +20,7 @@ export default function OnboardingForm() {
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [experience, setExperience] = useState("");
+  const [phone, setPhone] = useState("");
 
   const toggleSyllabus = (s: string) => {
     setSyllabuses((prev) =>
@@ -69,12 +70,13 @@ export default function OnboardingForm() {
   const selectAll = () => setSubjects(availableSubjects);
 
   const submit = async () => {
-    if (
-      syllabuses.length === 0 ||
-      classLevel.length === 0 ||
-      subjects.length === 0 ||
-      !experience
-    ) {
+   if (
+  syllabuses.length === 0 ||
+  classLevel.length === 0 ||
+  subjects.length === 0 ||
+  !experience ||
+  !phone
+){
       return toast.error("Please complete all fields");
     }
 
@@ -85,8 +87,8 @@ export default function OnboardingForm() {
   classes: classLevel,
   subjects,
   experience,
+  phone,
 });
-
 
      toast.success("🎉 Onboarding Completed Successfully!", {
   duration: 3000,
@@ -262,7 +264,22 @@ setTimeout(() => {
                 )}
               </div>
             )}
+            {/* PHONE NUMBER */}
+<div className="p-8 group animate-fade-in-up text-left">
+  <div className="mb-4">
+    <h2 className="text-lg font-black text-slate-800">
+      Phone Number
+    </h2>
+  </div>
 
+  <input
+    type="tel"
+    placeholder="Enter phone number"
+    value={phone}
+    onChange={(e) => setPhone(e.target.value)}
+    className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-primary"
+  />
+</div>
             {/* EXPERIENCE SECTION */}
             <div className="p-8 group animate-fade-in-up text-left">
               <div className="flex items-center gap-3 mb-6">

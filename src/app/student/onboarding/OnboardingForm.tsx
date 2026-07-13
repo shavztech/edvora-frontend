@@ -23,15 +23,21 @@ export default function OnboardingForm() {
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!syllabus || !classLevel) return;
+ useEffect(() => {
+  if (!syllabus || !classLevel) return;
 
-    api
-      .get(
-        `/students/subjects?syllabus=${syllabus}&classLevel=${classLevel}`
-      )
-      .then((res) => setAvailableSubjects(res.data.subjects));
-  }, [syllabus, classLevel]);
+  console.log("Fetching subjects:", syllabus, classLevel);
+
+  api
+    .get(`/students/subjects?syllabus=${syllabus}&classLevel=${classLevel}`)
+    .then((res) => {
+      console.log("Subjects Response:", res.data);
+      setAvailableSubjects(res.data.subjects);
+    })
+    .catch((err) => {
+      console.error("Subjects API Error:", err.response?.data || err.message);
+    });
+}, [syllabus, classLevel]);
 
   const toggleSubject = (s: string) => {
     setSubjects((prev) =>
@@ -48,7 +54,9 @@ export default function OnboardingForm() {
 
     setSubmitting(true);
     try {
+      console.log("Phone value:", phone);
       await api.post("/students/onboarding", {
+        
   syllabus,
   classLevel,
   subjects,
