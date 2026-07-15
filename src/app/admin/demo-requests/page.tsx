@@ -56,11 +56,17 @@ export default function AdminDemoPage() {
   const [filterDate, setFilterDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  interface Mentor {
-    _id: string;
-    name: string;
-    email: string;
-  }
+ interface Mentor {
+  _id: string;
+  name: string;
+  email: string;
+
+  mentorOnboarding?: {
+    syllabus: string[];
+    classes: string[];
+    subjects: string[];
+  };
+}
 
   interface Slot {
     _id: string;
@@ -168,6 +174,9 @@ export default function AdminDemoPage() {
       setLoadingSlots((prev) => ({ ...prev, [mentorId]: false }));
     }
   };
+  const getSelectedMentor = (mentorId: string) => {
+  return mentors.find((mentor) => mentor._id === mentorId);
+};
 useEffect(() => {
   const init = async () => {
     await loadDemos();
@@ -613,6 +622,30 @@ Total {monthDemos.length} Demo Requests
                     {/* Slot Dropdown */}
                     {selectedMentorId[d._id] && (
                       <div className="space-y-1">
+                        {(() => {
+  const mentor = getSelectedMentor(selectedMentorId[d._id]);
+
+  if (!mentor?.mentorOnboarding) return null;
+
+  return (
+    <div className="rounded-xl border p-3 bg-slate-50 space-y-2">
+      <p>
+        <strong>Syllabus:</strong>{" "}
+        {mentor.mentorOnboarding.syllabus?.join(", ")}
+      </p>
+
+      <p>
+        <strong>Classes:</strong>{" "}
+        {mentor.mentorOnboarding.classes?.join(", ")}
+      </p>
+
+      <p>
+        <strong>Subjects:</strong>{" "}
+        {mentor.mentorOnboarding.subjects?.join(", ")}
+      </p>
+    </div>
+  );
+})()}
                         <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
                           Select Available Slot
                         </label>
