@@ -42,6 +42,7 @@ interface DemoRequest {
     endTime: string;
   };
   createdAt: string;
+  meetLink?: string;
 }
 
 const formatTimeTo12h = (timeStr: string) => {
@@ -114,7 +115,21 @@ export default function MentorDemoRequestsPage() {
                 toast.dismiss(t.id);
                 setProcessingId(demoId);
                 try {
-                  await api.patch(`/demo/${demoId}/status`, { status: "accepted" });
+                const res = await api.patch(`/demo/${demoId}/status`, {
+  status: "accepted",
+});
+
+setDemos((prev) =>
+  prev.map((d) =>
+    d._id === demoId
+      ? {
+          ...d,
+          mentorStatus: "accepted",
+          meetLink: res.data.demo.meetLink,
+        }
+      : d
+  )
+);
                   toast.success("Demo accepted successfully", { icon: "✅" });
                   setDemos((prev) =>
                     prev.map((d) =>
@@ -465,7 +480,24 @@ const isRejected = d.mentorStatus === "rejected";
         : "bg-red-50 text-red-600"
     }`}
   >
-    {isAccepted ? "✅ Accepted" : "❌ Rejected"}
+   {isAccepted ? (
+  <div className="space-y-3">
+    <div className="bg-green-50 text-green-600 py-2.5 rounded-xl text-center font-black text-[10px] uppercase tracking-widest">
+      ✅ Accepted
+    </div>
+
+    {d.meetLink && (
+      <button
+        onClick={() => window.open(d.meetLink, "_blank")}
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all"
+      >
+        🎥 Join Now
+      </button>
+    )}
+  </div>
+) : (
+  "❌ Rejected"
+)}
   </div>
 )}
                   </div>
