@@ -149,13 +149,16 @@ export default function AdminPaymentsPage() {
 useEffect(() => {
   loadPayments();
 
+  api.put("/notifications/read/payment").then(() => {
+    window.dispatchEvent(new Event("refresh-notifications"));
+  });
+
   const interval = setInterval(() => {
     loadPayments();
-  }, 10000); // 10 seconds
+  }, 10000);
 
   return () => clearInterval(interval);
 }, [filterStatus, filterDate, filterMethod]);
-
   const StatusBadge = ({ status }: { status: string }) => {
     const s = status.toLowerCase();
     const styles: Record<string, string> = {

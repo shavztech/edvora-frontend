@@ -32,6 +32,7 @@ const [mentors, setMentors] = useState<any[]>([]);
 
   // 🔄 Load reports
   const loadReports = async () => {
+    console.log("Reports Page Render");
     try {
       const res = await api.get("/reports");
       setReports(res.data.reports || []);

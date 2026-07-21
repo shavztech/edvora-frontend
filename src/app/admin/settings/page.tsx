@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 export default function AdminSettings() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
   const [submitting, setSubmitting] = useState(false);
@@ -54,14 +55,14 @@ export default function AdminSettings() {
   const isSuperAdmin = adminUser?.role === "super_admin";
 
   const createUser = async () => {
-    if (!name || !email || !password) {
+    if (!name || !email || !phone || !password) {
       return toast.error("Please fill in all required fields");
     }
     setSubmitting(true);
     try {
-      await api.post("/superadmin/create-user", { name, email, password, role });
+      await api.post("/superadmin/create-user", { name, email, phone, password, role });
       toast.success("User created successfully!");
-      setName(""); setEmail(""); setPassword(""); setRole("student");
+      setName(""); setEmail(""); setPhone(""); setPassword(""); setRole("student");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to create user");
     } finally {
@@ -183,7 +184,22 @@ export default function AdminSettings() {
                     )}
                   </div>
                 </div>
+                {/* Phone Number */}
+<div className="group">
+  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block group-focus-within:text-primary transition-colors">
+    Phone Number
+  </label>
 
+  <div className="relative">
+    <input
+      type="tel"
+      className="w-full pl-4 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all placeholder:text-slate-300 text-slate-700"
+      placeholder="9876543210"
+      value={phone}
+      onChange={(e) => setPhone(e.target.value)}
+    />
+  </div>
+</div>
                 {/* Email */}
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Email Address</label>
@@ -192,6 +208,7 @@ export default function AdminSettings() {
                     <span className="text-sm font-bold text-slate-700 break-all">{adminUser.email}</span>
                   </div>
                 </div>
+                
 
                 {/* Role */}
                 <div>
@@ -336,7 +353,22 @@ export default function AdminSettings() {
                 />
               </div>
             </div>
+              {/* Phone Number */}
+<div className="group">
+  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">
+    Phone Number
+  </label>
 
+  <div className="relative">
+    <input
+      type="tel"
+      value={phone}
+      onChange={(e) => setPhone(e.target.value)}
+      placeholder="Enter phone number"
+      className="w-full pl-4 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl"
+    />
+  </div>
+</div>
             {/* Password */}
             <div className="group">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block group-focus-within:text-primary transition-colors">Secure Password</label>

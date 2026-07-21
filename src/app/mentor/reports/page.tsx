@@ -20,12 +20,15 @@ import {
 import toast from "react-hot-toast";
 
 export default function MentorReportsPage() {
+   console.log("MentorReports Render");
+
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
  const [responses, setResponses] = useState<Record<string,string>>({});
   const loadReports = async () => {
+      console.log("loadReports called");
     try {
       setLoading(true);
       const res = await api.get("/reports");
@@ -110,7 +113,9 @@ const sendResponse = async (id: string) => {
     r.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.student?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  useEffect(() => {
+  loadReports();
+}, []);
   const stats = {
     total: reports.length,
     pending: reports.filter(r => !r.isRead).length,
