@@ -1,68 +1,199 @@
+
+"use client";
+
 import Link from "next/link";
-import { ArrowUpRight, Zap, MessageSquare, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  PhoneCall,
+  BookOpen
 
-export default function CTASection() {
+} from "lucide-react";
+
+
+export default function ProgramCTA() {
+
+
   return (
-    <section className="max-w-7xl mx-auto px-6 pb-32">
-      <div className="relative overflow-hidden bg-[#020617] rounded-[3rem] p-12 lg:p-20 border border-white/5 shadow-2xl">
+    <section className="relative overflow-hidden py-19 lg:py-7">
 
-        {/* 🌌 BACKGROUND DECOR */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-100px] left-[-100px] w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
+      
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-12 mt-2">
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-16">
+        {/* Heading */}
 
-          {/* TEXT CONTENT */}
-          <div className="max-w-xl space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20">
-              <Sparkles className="w-4 h-4 text-indigo-400 fill-indigo-400" />
-              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Deployment Ready</span>
+        <div className="mx-auto max-w-3xl text-center">
+
+          <span className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-5 py-2 text-secondary font-bold uppercase tracking-[0.3em] text-xs mb-6">
+          ✨ Ready To Begin?
+
+          </span>
+
+          <h2 className="text-4xl md:text-5xl font-[950] text-navy leading-tight">
+            Start Your Child's
+
+           <span className="bg-gradient-to-r from-primary via-blue-500 to-secondary bg-clip-text text-transparent">
+              Learning Journey Today
+
+            </span>
+
+          </h2>
+
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+
+            Choose how you'd like to connect with Edvora.
+            Book a free demo, speak with our learning advisor,
+            or explore programs designed for every learner.
+
+          </p>
+
+        </div>
+
+        {/* CTA Cards */}
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-3">
+                    {/* Card 1 */}
+
+          <div className="group relative overflow-hidden rounded-[32px] border border-white/70 bg-white/80 p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(59,111,182,.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(59,111,182,.18)]">
+
+            {/* Glow */}
+
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-primary to-blue-500 opacity-20 blur-3xl transition-all duration-700 group-hover:scale-125" />
+
+            {/* Icon */}
+
+            <div className="relative flex h-18 w-18 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-blue-500 text-white shadow-[0_20px_40px_rgba(59,111,182,.35)] transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+
+              <CalendarDays size={34} />
+
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-2xl md:text-4xl font-[950] text-white tracking-tighter leading-tight">
-                Initialize Your <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-sky-400 ">Academic Future.</span>
-              </h2>
-              <p className="text-sm md:text-lg text-slate-400 font-bold text-lg leading-relaxed">
-                Secure your place in the most advanced learning ecosystem.
-                Join 4,000+ elite operatives and master your technical growth.
-              </p>
-            </div>
+            <h3 className="mt-8 text-2xl font-black text-navy">
+
+              Book Free Demo
+
+            </h3>
+
+            <p className="mt-4 leading-7 text-slate-600">
+
+              Experience a live one-to-one class with our expert mentors
+              before enrolling. Discover how personalized learning can
+              transform your child's academic journey.
+
+            </p>
+
+            <Link
+              href="/contact"
+              className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105"
+            >
+
+              Book Now
+
+              <ArrowRight
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+
+            </Link>
+
           </div>
 
-          {/* ACTION CLUSTER */}
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <Link
-              href="/demo-booking"
-              className="group h-16 px-10 bg-white text-slate-950 font-[900] text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:-translate-y-1 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-            >
-              Initialize Demo <Zap size={16} className="fill-slate-950" />
-            </Link>
+          {/* Card 2 */}
+
+          <div className="group relative overflow-hidden rounded-[32px] border border-white/70 bg-white/80 p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(59,111,182,.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(59,111,182,.18)]">
+
+            {/* Glow */}
+
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-secondary to-green-500 opacity-20 blur-3xl transition-all duration-700 group-hover:scale-125" />
+
+            {/* Icon */}
+
+            <div className="relative flex h-18 w-18 items-center justify-center rounded-3xl bg-gradient-to-br from-secondary to-green-500 text-white shadow-[0_20px_40px_rgba(111,168,67,.35)] transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+
+              <PhoneCall size={34} />
+
+            </div>
+
+            <h3 className="mt-8 text-2xl font-black text-navy">
+
+              Talk to an Advisor
+
+            </h3>
+
+            <p className="mt-4 leading-7 text-slate-600">
+
+              Connect with our academic experts to receive personalized
+              guidance, curriculum recommendations, and answers to all
+              your questions before getting started.
+
+            </p>
 
             <Link
-              href="/contac"
-              className="h-16 px-10 bg-white/5 text-white border border-white/10 font-[900] text-xs uppercase tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3"
+              href="/contact"
+              className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-secondary to-green-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105"
             >
-              Contact Operatives <MessageSquare size={16} />
+
+              Contact Us
+
+              <ArrowRight
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+
             </Link>
+
+          </div>
+                    {/* Card 3 */}
+
+          <div className="group relative overflow-hidden rounded-[32px] border border-white/70 bg-white/80 p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(59,111,182,.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(59,111,182,.18)]">
+
+            {/* Glow */}
+
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 opacity-20 blur-3xl transition-all duration-700 group-hover:scale-125" />
+
+            {/* Icon */}
+
+            <div className="relative flex h-18 w-18 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-[0_20px_40px_rgba(251,146,60,.35)] transition-all duration-500 group-hover:rotate-6 group-hover:scale-110">
+
+              <BookOpen size={34} />
+
+            </div>
+
+            <h3 className="mt-8 text-2xl font-black text-navy">
+
+              Explore Programs
+
+            </h3>
+
+            <p className="mt-4 leading-7 text-slate-600">
+
+              Discover our Foundation, Curriculum, and Grade-wise
+              learning programs designed for students from
+              Kindergarten to Grade 12.Find the perfect one.
+
+            </p>
+
+            <Link
+              href="/programs"
+              className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-orange-400 to-amber-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105"
+            >
+
+              View Programs
+
+              <ArrowRight
+                size={18}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+
+            </Link>
+
           </div>
 
         </div>
 
-        {/* SUBTLE FOOTER TAG */}
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-wrap justify-center lg:justify-start gap-8 opacity-40">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Global Server Network Online</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">256-Bit SSL Encryption Active</span>
-          </div>
-        </div>
 
       </div>
+
     </section>
   );
 }
