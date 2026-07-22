@@ -25,7 +25,7 @@ export default function Footer() {
       <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10">
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
 
           {/* ================= COMPANY ================= */}
 
@@ -246,29 +246,13 @@ export default function Footer() {
 
         {/* Bottom */}
 
-        <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row">
+        <div className=" items-center justify-between gap-4 text-center md:flex-row">
 
           <p className="text-sm text-white/60">
             © {new Date().getFullYear()} Edvora. All Rights Reserved.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-5 text-sm">
-
-            <Link
-              href="/privacy-policy"
-              className="text-white/60 transition hover:text-secondary"
-            >
-              Privacy Policy
-            </Link>
-
-            <Link
-              href="/terms"
-              className="text-white/60 transition hover:text-secondary"
-            >
-              Terms & Conditions
-            </Link>
-
-          </div>
+         
 
         </div>
 
