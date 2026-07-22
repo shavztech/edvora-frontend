@@ -1,108 +1,176 @@
-import {
-  UserPlus,
-  ShieldCheck,
-  UserCheck,
-  CalendarClock,
-  GraduationCap,
-  ArrowRight
-} from "lucide-react";
+
+
+
+import Image from "next/image";
+import { GraduationCap } from "lucide-react";
 
 const steps = [
   {
-    icon: UserPlus,
-    title: "Inquire & Demo",
-    desc: "Prospective students initialize their journey by requesting a comprehensive demo.",
-    id: "01"
+    id: "01",
+    title: "Enquire & Demo",
+    desc: "Book a free demo class and explore how Edvora can help students learn better.",
+    image: "/how-it-works/demo-3.jpg",
+    color: "bg-green-500",
+    line: "bg-green-500",
   },
   {
-    icon: ShieldCheck,
+    id: "02",
     title: "Identity Verification",
-    desc: "Admin operatives verify credentials and establish the secure student profile.",
-    id: "02"
+    desc: "Our team verifies your details and creates a secure student profile.",
+    image: "/how-it-works/verify.png",
+    color: "bg-blue-600",
+    line: "bg-blue-600",
   },
   {
-    icon: UserCheck,
+    id: "03",
     title: "Expert Matching",
-    desc: "Our algorithm assigns the optimal verified mentor based on subject expertise.",
-    id: "03"
+    desc: "Students are matched with the best mentor based on subject and goals.",
+    image: "/how-it-works/mentor-2.png",
+    color: "bg-purple-600",
+    line: "bg-purple-600",
   },
   {
-    icon: CalendarClock,
+    id: "04",
     title: "Schedule Sync",
-    desc: "Mentor synchronizes availability and initializes the session infrastructure.",
-    id: "04"
+    desc: "Choose your convenient timing and schedule classes seamlessly.",
+    image: "/how-it-works/shedule-3.png",
+    color: "bg-orange-500",
+    line: "bg-orange-500",
   },
   {
-    icon: GraduationCap,
-    title: "Knowledge Transfer",
-    desc: "Student joins the live ecosystem and begins high-density learning.",
-    id: "05"
+    id: "05",
+    title: "Learning Begins",
+    desc: "Join live interactive classes and begin your learning journey.",
+    image: "/how-it-works/learning-5.jpg",
+    color: "bg-green-600",
+    line: "bg-green-600",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section className=" py-8 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        {/* HEADER */}
-        <div className="text-center max-w-2xl mx-auto mb-20 space-y-4">
-           <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em]">Operational Protocol</h2>
-           <h3 className="text-4xl font-[950] text-slate-950 tracking-tighter">How the Ecosystem <span className="text-indigo-600">Integrates.</span></h3>
-           <p className="text-slate-500 font-bold text-base">A streamlined five-phase initialization process from first contact to expert-led education.</p>
+    <section className="relative overflow-hidden py-8 lg:py-10 bg-edvora-gradient">
+
+      {/* Background Glow */}
+      <div className="absolute top-0 left-0 w-[450px] h-[450px] bg-primary/10 rounded-full blur-[140px]" />
+      <div className="absolute bottom-0 right-0 w-[450px] h-[450px] bg-secondary/10 rounded-full blur-[140px]" />
+
+      {/* Decorations */}
+      <div className="hidden lg:block absolute left-20 top-32 text-primary/20 animate-float-medium text-7xl">
+        ✈️
+      </div>
+
+      <div className="hidden lg:block absolute right-20 top-24 text-primary/20 animate-float-slow">
+        <GraduationCap size={120} />
+      </div>
+
+      {/* Left dotted path */}
+      <svg
+        className="hidden lg:block absolute left-20 top-40 z-0"
+        width="220"
+        height="120"
+      >
+        <path
+          d="M10 60 C100 -20, 150 120, 210 50"
+          stroke="#3B6FB6"
+          strokeWidth="3"
+          strokeDasharray="10 10"
+          fill="none"
+          opacity="0.5"
+        />
+      </svg>
+
+      {/* Right dotted path */}
+      <svg
+        className="hidden lg:block absolute right-20 top-48 z-0"
+        width="220"
+        height="120"
+      >
+        <path
+          d="M10 50 C80 120, 130 -20, 210 60"
+          stroke="#3B6FB6"
+          strokeWidth="3"
+          strokeDasharray="10 10"
+          fill="none"
+          opacity="0.5"
+        />
+      </svg>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10 ">
+
+        {/* Header */}
+        <div className="text-center max-w-4xl mx-auto mb-14">
+
+          <div className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-5 py-2 text-secondary font-bold uppercase tracking-[0.3em] text-xs mb-6">
+            ✨ HOW IT WORKS
+          </div>
+
+          <h2 className="text-4xl md:text-5xl font-[950] text-navy leading-tight">
+            Your Learning Journey
+            <br />
+
+            <span className="bg-gradient-to-r from-primary via-blue-500 to-secondary bg-clip-text text-transparent">
+              In 5 Easy Steps
+            </span>
+          </h2>
+
+          <p className="mt-8 text-lg lg:text-xl text-slate-600 leading-relaxed">
+            From booking a demo to attending live classes,
+            we make every step simple, safe and effective
+            for KG-12 students.
+          </p>
         </div>
 
-        {/* STEPS GRID */}
+        {/* Timeline */}
         <div className="relative">
-           {/* OPTIONAL: CONNECTING LINE (DESKTOP) */}
-           <div className="hidden lg:block absolute top-[100px] left-0 w-full h-px bg-slate-100 z-0" />
 
-           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12 lg:gap-8 relative z-10">
-              {steps.map((step, i) => (
-                <div key={i} className="group space-y-8">
-                  
-                  {/* ICON & INDEX */}
-                  <div className="relative">
-                     <div className="w-20 h-20 rounded-[2rem] bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-indigo-600/20 group-hover:-translate-y-2 relative z-10">
-                        <step.icon className="w-8 h-8 text-indigo-600 group-hover:text-white transition-colors duration-500" />
-                     </div>
-                     <span className="absolute -top-4 -right-4 text-5xl font-[950] text-slate-100 group-hover:text-indigo-50/50 transition-colors pointer-events-none select-none italic">
-                        {step.id}
-                     </span>
-                  </div>
+          {/* Main Dotted Line */}
+          <div className="hidden lg:block absolute top-10 left-[10%] w-[80%] border-t-[3px] border-dashed border-primary/40 z-0"></div>
 
-                  {/* CONTENT */}
-                  <div className="space-y-3">
-                    <h4 className="text-xl font-[900] text-slate-900 tracking-tight leading-none">
-                      {step.title}
-                    </h4>
-                    <p className="text-slate-500 font-bold text-sm leading-relaxed">
-                      {step.desc}
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative z-10">
 
-                  {/* MOBILE INDICATOR */}
-                  {i < steps.length - 1 && (
-                     <div className="lg:hidden flex justify-center py-4">
-                        <ArrowRight className="w-6 h-6 text-slate-200 rotate-90 md:rotate-0" />
-                     </div>
-                  )}
+            {steps.map((step, index) => (
+              <div key={index} className="relative group">
+
+                {/* Step Number */}
+                <div
+                  className={`absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full ${step.color} border-[6px] border-white shadow-2xl flex items-center justify-center text-white text-3xl font-extrabold z-20 `}
+                >
+                  {step.id}
                 </div>
-              ))}
-           </div>
-        </div>
 
-        {/* CTA CALLOUT */}
-        <div className="mt-20 p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-           <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-slate-100">
-                 <ShieldCheck className="w-6 h-6" />
+                {/* Card */}
+                <div className="pt-16 pb-8 px-6  bg-white/150 backdrop-blur-xl rounded-[35px] border border-white shadow-[0_20px_50px_rgba(59,117,177,0.15)] hover:-translate-y-4 hover:shadow-[0_30px_70px_rgba(59,117,177,0.25)] transition-all duration-500 h-full text-center">
+
+                  {/* Cartoon Image */}
+                  <div className="relative h-51 flex items-center justify-center">
+                    <Image
+                      src={step.image}
+                      alt={step.title}
+                      width={300}
+                      height={500}
+                      className="object-contain group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-navy mt-6 mb-4">
+                    {step.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-slate-600 leading-relaxed text-sm">
+                    {step.desc}
+                  </p>
+
+                  {/* Bottom line */}
+                  <div
+                    className={`mt-8 mx-auto w-14 h-1 rounded-full ${step.line}`}
+                  />
+                </div>
               </div>
-              <p className="text-sm font-bold text-slate-600">All phases are monitored and verified by our central administrative console.</p>
-           </div>
-           <button className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors flex items-center gap-2 group">
-              View Detailed Curriculum <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-           </button>
+            ))}
+          </div>
         </div>
 
       </div>
