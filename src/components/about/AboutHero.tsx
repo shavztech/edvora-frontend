@@ -7,7 +7,8 @@ import { ArrowRight } from "lucide-react";
 
 export default function AboutHero() {
   return (
-    <section className="relative overflow-hidden pt-12 pb-14 md:pt-10 md:pb-10 lg:pt-20 lg:pb-20">
+    <section className="relative overflow-hidden pt-12 pb-14 py-10
+     md:pt-10 md:pb-10 lg:pt-20 lg:pb-20">
 
       {/* Primary Glow */}
       <div className="absolute -top-32 -left-32 h-[520px] w-[520px] rounded-full bg-primary/12 blur-[150px]" />
