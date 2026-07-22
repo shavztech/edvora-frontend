@@ -47,7 +47,7 @@ export default function AboutHero() {
               sm:text-[3rem]
               md:text-[3.8rem]
               lg:text-[4.8rem]
-              xl:text-[5.3rem]
+              xl:text-[4.8rem]
             ">
 
               Shaping Curious Minds
