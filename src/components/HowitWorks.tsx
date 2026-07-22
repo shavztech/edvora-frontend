@@ -9,7 +9,7 @@ const steps = [
     id: "01",
     title: "Enquire & Demo",
     desc: "Book a free demo class and explore how Edvora can help students learn better.",
-    image: "/how-it-works/demo-3.jpg",
+    image: "/how-it-works/demo.jpg",
     color: "bg-green-500",
     line: "bg-green-500",
   },
@@ -25,7 +25,7 @@ const steps = [
     id: "03",
     title: "Expert Matching",
     desc: "Students are matched with the best mentor based on subject and goals.",
-    image: "/how-it-works/mentor-2.png",
+    image: "/how-it-works/mentor.png",
     color: "bg-purple-600",
     line: "bg-purple-600",
   },
@@ -33,7 +33,7 @@ const steps = [
     id: "04",
     title: "Schedule Sync",
     desc: "Choose your convenient timing and schedule classes seamlessly.",
-    image: "/how-it-works/shedule-3.png",
+    image: "/how-it-works/shedule.png",
     color: "bg-orange-500",
     line: "bg-orange-500",
   },
@@ -41,7 +41,7 @@ const steps = [
     id: "05",
     title: "Learning Begins",
     desc: "Join live interactive classes and begin your learning journey.",
-    image: "/how-it-works/learning-5.jpg",
+    image: "/how-it-works/learning.jpg",
     color: "bg-green-600",
     line: "bg-green-600",
   },
@@ -49,7 +49,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="relative overflow-hidden py-8 lg:py-10 bg-edvora-gradient">
+    <section className="relative overflow-hidden py-8 lg:py-10">
 
       {/* Background Glow */}
       <div className="absolute top-0 left-0 w-[450px] h-[450px] bg-primary/10 rounded-full blur-[140px]" />
