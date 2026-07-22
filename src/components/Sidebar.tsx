@@ -30,6 +30,7 @@ export default function Sidebar({ role }: { role: Role }) {
   const { isOpen, close } = useSidebar();
   const [demoNotificationCount, setDemoNotificationCount] = useState(0);
   const [bookingNotificationCount, setBookingNotificationCount] = useState(0);
+  const [paymentNotificationCount, setPaymentNotificationCount] = useState(0);
   // Close sidebar on route change (mobile)
   useEffect(() => {
     close();
@@ -66,28 +67,39 @@ export default function Sidebar({ role }: { role: Role }) {
     });
   };
 useEffect(() => {
-  if (!["admin", "super_admin", "mentor"].includes(role)) return;
+ if (!["admin", "super_admin", "mentor", "student"].includes(role)) return;
 
-  const load = async () => {
-    try {
-      const demoType = (role === "admin" || role === "super_admin") ? "demo_request" : "mentor_demo";
-      const demoRes = await api.get(
-        `/notifications/count?type=${demoType}&t=${Date.now()}`
-      );
-      setDemoNotificationCount(demoRes.data.count);
+ const load = async () => {
+  console.log("load called", role, new Date().toLocaleTimeString());
 
-      const bookingRes = await api.get(
-        `/notifications/count?type=booking&t=${Date.now()}`
-      );
-      setBookingNotificationCount(bookingRes.data.count);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  try {
+    const demoType =
+      role === "admin" || role === "super_admin"
+        ? "demo_request"
+        : "mentor_demo";
+
+    const demoRes = await api.get(
+      `/notifications/count?type=${demoType}&t=${Date.now()}`
+    );
+    setDemoNotificationCount(demoRes.data.count);
+
+    const bookingRes = await api.get(
+      `/notifications/count?type=booking&t=${Date.now()}`
+    );
+    setBookingNotificationCount(bookingRes.data.count);
+    const paymentRes = await api.get(
+  `/notifications/count?type=payment&t=${Date.now()}`
+);
+
+setPaymentNotificationCount(paymentRes.data.count);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   load();
 
-  const id = setInterval(load, 3000);
+  const id = setInterval(load, 30000);
 
   window.addEventListener("refresh-notifications", load);
 
@@ -238,15 +250,23 @@ useEffect(() => {
     </span>
   )}
 
-  {m.label === "Bookings" &&
+ {(m.label === "Bookings" || m.label === "My Bookings") &&
  (role === "admin" ||
   role === "super_admin" ||
-  role === "mentor") &&
+  role === "mentor" ||
+  role === "student") &&
  bookingNotificationCount > 0 && (
     <span className="ml-auto flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] font-bold">
       {bookingNotificationCount}
     </span>
   )}
+  {m.label === "Payments" &&
+ (role === "admin" || role === "super_admin") &&
+ paymentNotificationCount > 0 && (
+    <span className="ml-auto flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-600 text-white text-[10px] font-bold">
+      {paymentNotificationCount}
+    </span>
+)}
 </div>
                 {isActive && (
                   <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>

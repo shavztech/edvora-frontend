@@ -138,18 +138,20 @@ export default function AdminDemoPage() {
     }
   }, [filterStatus, filterDate]);
 
-  const loadMentors = useCallback(async () => {
-    try {
-      setLoadingMentors(true);
-      const res = await api.get("/slots/available-mentors");
-      setMentors(res.data || []);
-    } catch (error) {
-      console.error("Failed to load available mentors:", error);
-      toast.error("Failed to load available mentors");
-    } finally {
-      setLoadingMentors(false);
-    }
-  }, []);
+ const loadMentors = useCallback(async () => {
+  try {
+    setLoadingMentors(true);
+
+    const res = await api.get("/slots/available-mentors");
+
+    setMentors(res.data || []);
+  } catch (error) {
+    console.error("Failed to load available mentors:", error);
+    toast.error("Failed to load available mentors");
+  } finally {
+    setLoadingMentors(false);
+  }
+}, []);
 
   const handleMentorChange = async (demoId: string, mentorId: string) => {
     setSelectedMentorId((prev) => ({ ...prev, [demoId]: mentorId }));
@@ -165,8 +167,11 @@ export default function AdminDemoPage() {
 
     try {
       setLoadingSlots((prev) => ({ ...prev, [mentorId]: true }));
-      const res = await api.get(`/slots/available/${mentorId}`);
-      setSlots((prev) => ({ ...prev, [mentorId]: res.data || [] }));
+     const res = await api.get(`/slots/available/${mentorId}`);
+      setSlots((prev) => ({
+  ...prev,
+  [mentorId]: res.data,
+}));
     } catch (error) {
       console.error("Failed to load available slots:", error);
       toast.error("Failed to load available slots for this mentor");

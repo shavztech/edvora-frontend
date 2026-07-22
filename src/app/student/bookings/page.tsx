@@ -131,9 +131,20 @@ export default function StudentBookingsPage() {
     ), { duration: 5000, position: "top-center" });
   };
 
-  useEffect(() => {
-    loadBookings();
-  }, [filterDate, filterMonth, filterYear, filterAttendance]);
+ useEffect(() => {
+  loadBookings();
+
+  const markNotificationsRead = async () => {
+    try {
+   await api.patch("/notifications/read-booking");
+      window.dispatchEvent(new Event("refresh-notifications"));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  markNotificationsRead();
+}, [filterDate, filterMonth, filterYear, filterAttendance]);
 
   if (loading && bookings.length === 0) {
     return (

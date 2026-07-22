@@ -31,6 +31,7 @@ export default function AdminReportsPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const loadReports = async (status: FilterStatus = filterStatus) => {
+     
     try {
       setLoading(true);
       const params: any = {};

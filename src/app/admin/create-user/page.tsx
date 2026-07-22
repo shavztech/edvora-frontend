@@ -8,12 +8,13 @@ import toast from "react-hot-toast";
 export default function AdminSettings() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
 
   const createUser = async () => {
-    if (!name || !email || !password) {
+    if (!name || !email || !phone || !password) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -21,15 +22,17 @@ export default function AdminSettings() {
     setLoading(true);
     try {
       await api.post("/superadmin/create-user", {
-        name,
-        email,
-        password,
-        role,
-      });
+  name,
+  email,
+  phone,
+  password,
+  role,
+});
 
       toast.success("User created successfully");
       setName("");
       setEmail("");
+      setPhone("");
       setPassword("");
       setRole("student");
     } catch (err: any) {
@@ -86,7 +89,19 @@ export default function AdminSettings() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+  <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+    📱 Phone Number
+  </label>
 
+  <input
+    type="tel"
+    className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none transition-all placeholder:text-slate-300"
+    placeholder="Enter phone number"
+    value={phone}
+    onChange={(e) => setPhone(e.target.value)}
+  />
+</div>
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ml-1">
                 <Lock className="w-3.5 h-3.5" />

@@ -95,9 +95,24 @@ export default function AdminAttendancePage() {
     try {
       let res;
       if (debouncedSearch) {
-        res = await api.get("/admin/attendance/search", { 
-          params: { query: debouncedSearch, page, limit: 10 } 
-        });
+       const params: any = {
+  page,
+  limit: 10,
+};
+
+if (statusFilter !== "all") {
+  params.status = statusFilter;
+}
+
+if (monthFilter !== "all") {
+  params.month = monthFilter;
+}
+
+if (yearFilter !== "all") {
+  params.year = yearFilter;
+}
+
+res = await api.get("/admin/attendance/filter", { params });
       } else if (statusFilter !== "all" || monthFilter !== "all" || yearFilter !== "all") {
         res = await api.get("/admin/attendance/filter", {
           params: { status: statusFilter, month: monthFilter, year: yearFilter, page, limit: 10 }
@@ -110,7 +125,7 @@ export default function AdminAttendancePage() {
       
       if (res.data.success) {
         console.log("ATTENDANCE RESPONSE");
-console.log(res.data);
+         console.log(JSON.stringify(res.data.data[0], null, 2));
         setRecords(res.data.records || res.data.data || []);
         setTotalPages(res.data.totalPages || 1);
       } else {
@@ -147,6 +162,18 @@ console.log(res.data);
     if (status === false) return <Cross className="w-5 h-5 text-rose-500 font-bold" />;
     return <Circle className="w-2.5 h-2.5 text-slate-300 fill-slate-300 mx-auto" />;
   };
+  const groupedAttendance = records.reduce((acc, item) => {
+  const date = item.date;
+
+  if (!acc[date]) {
+    acc[date] = [];
+  }
+
+  acc[date].push(item);
+
+  return acc;
+}, {} as Record<string, AttendanceRecord[]>);
+  
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -268,15 +295,24 @@ console.log(res.data);
           </div>
         ) : (
           <div className="space-y-4">
-            <AnimatePresence>
-              {records.map((record) => (
-             <motion.div
-  key={record._id}
-  initial={{ opacity: 0, y: 10 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, scale: 0.95 }}
-  className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group"
->
+           
+
+    <AnimatePresence>
+  {Object.entries(groupedAttendance).map(([date, records]) => (
+    <div key={date} className="space-y-4 mb-8">
+      <h2 className="text-lg font-bold text-slate-700 mb-4">
+        📅 {new Date(date).toDateString()}
+      </h2>
+
+      {records.map((record) => (
+        <motion.div
+          key={record._id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group"
+        >
+ 
                   
                   {/* Left: Icon & Subject Info */}
                   <div className="flex items-center gap-5 w-full md:w-1/3">
@@ -358,9 +394,11 @@ console.log(res.data);
                     </div>
                   </div>
 
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                          </motion.div>
+      ))}
+    </div>
+  ))}
+</AnimatePresence>
           </div>
         )}
       </div>
