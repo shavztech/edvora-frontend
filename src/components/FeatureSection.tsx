@@ -124,23 +124,13 @@ export default function FeatureSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                   {/* Icon */}
-                  <div className=" absolut top-5 left-5 w-14 h-14 rounded-2x bg-white/20 backdrop-blur-lg border border-white/30  flex items-center  justify-center     text-white">
+                  <div className=" absolute top-5 left-5 w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-lg border border-white/30  flex items-center  justify-center text-white">
                  
                 <Icon size={28} />
                   </div>
 
                   {/* Label */}
-                  <div className="
-                  absolute
-                  top-5
-                  right-5
-                  px-4
-                  py-1.5
-                  rounded-full
-                  bg-secondary
-                  text-white
-                  text-xs
-                  font-bold
+                  <div className="absolute top-5 right-5  px-4 py-1.5 rounded-full bg-secondary  text-white text-xs font-bold
                 ">
                     {feature.label}
                   </div>
@@ -157,15 +147,7 @@ export default function FeatureSection() {
                     {feature.desc}
                   </p>
 
-                  <button className="
-                  flex
-                  items-center
-                  gap-2
-                  text-primary
-                  font-semibold
-                  group-hover:gap-4
-                  transition-all duration-300
-                ">
+                  <button className="   flex items-center gap-2 text-primary font-semibold group-hover:gap-4 transition-all duration-300">
                     Learn More
                     <ArrowRight size={18} />
                   </button>
@@ -173,18 +155,7 @@ export default function FeatureSection() {
                 </div>
 
                 {/* Hover Glow */}
-                <div className="
-                absolute
-                -top-10
-                -right-10
-                w-32
-                h-32
-                bg-primary/10
-                rounded-full
-                blur-3xl
-                opacity-0
-                group-hover:opacity-100
-                transition-all duration-500
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl opacity-0   group-hover:opacity-100  transition-all duration-500
               " />
               </div>
             )
@@ -204,11 +175,7 @@ export default function FeatureSection() {
             <img
               src="/features/blue-bag.png"
               alt="School Bag"
-              className="
-                w-20 sm:w-28 md:w-40 lg:w-64
-                object-contain
-                opacity-80 md:opacity-100
-                animate-float-slow"
+              className="  w-20 sm:w-28 md:w-40 lg:w-64 object-contain opacity-80 md:opacity-100 animate-float-slow"
             />
           </div>
 
@@ -257,22 +224,7 @@ export default function FeatureSection() {
 
             {/* Button */}
             <button
-              className="
-        bg-secondary
-        px-6 py-2.5
-        sm:px-7 sm:py-3
-        rounded-full
-        font-bold
-        text-sm sm:text-base
-        text-white
-        hover:scale-105
-        transition-all duration-300
-        shadow-[0_10px_30px_rgba(111,168,67,0.4)]
-        inline-flex
-        items-center
-        gap-3
-      "
-            >
+              className=" bg-secondary px-6 py-2.5sm:px-7 sm:py-3 rounded-full font-bold text-sm sm:text-base text-white hover:scale-105 transition-all duration-300 shadow-[0_10px_30px_rgba(111,168,67,0.4)] inline-flex items-center gap-3 ">
               Start Learning Today
               <ArrowRight size={20} />
             </button>
