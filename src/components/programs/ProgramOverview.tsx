@@ -118,7 +118,7 @@ export default function ProgramOverview() {
 
                 {/* Cards */}
 
-        <div className="mt-7  grid gap-6  sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-7 grid grid-cols-2 gap-6  sm:grid-cols-2 xl:grid-cols-4">
 
           {programs.map((program, index) => {
             const Icon = program.icon;

@@ -49,7 +49,7 @@ export default function GradePrograms() {
 
   return (
 
-<section className="relative overflow-hidden py-7 lg:py-9">
+<section className="relative overflow-hidden py-2 lg:py-9">
 
 <div className="absolute -left-32 top-0 h-80 w-80 rounded-full bg-primary/10 blur-[120px]" />
 
@@ -67,7 +67,7 @@ KG program
 
 </span>
 
-<h2 className="-mt-1 text-3xl sm:text-4xl md:text-5xl font-[950] text-navy leading-tight">
+<h2 className="-mt-3 text-3xl sm:text-4xl md:text-5xl font-[950] text-navy leading-tight">
 
  Learn, Play & Grow <br/>
 
@@ -80,7 +80,7 @@ KG program
 
 </h2>
 
-<p className="mt-9 text-lg leading-8 text-slate-600">
+<p className="mt-4  text-sm lg:text-lg  leading-6 lg:leading-8 text-slate-600">
 
 Our Kindergarten programs provide a joyful and engaging learning experience,
   helping children build strong foundations in literacy, numeracy, creativity,
@@ -91,11 +91,11 @@ Our Kindergarten programs provide a joyful and engaging learning experience,
 
 {/* Featured KG */}
 
-<div className="relative mt-9 overflow-hidden rounded-[40px] border border-pink-100 bg-white shadow-[0_30px_80px_rgba(236,72,153,.08)]">
+<div className="relative mt-6 overflow-hidden rounded-[40px] border border-pink-100 bg-white shadow-[0_30px_80px_rgba(236,72,153,.08)]">
 
 <div className="absolute inset-0 bg-gradient-to-r from-pink-50/70 via-white to-rose-50/70" />
 
-<div className="relative grid items-center gap-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.3fr_.9fr] p-10">
+<div className="relative grid items-center gap-5 lg:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1.3fr_.9fr] p-10">
 
 {/* Image */}
 
@@ -145,7 +145,7 @@ Kindergarten (KG)
 
 </div>
 
-<p className="mt-6 text-lg leading-8 text-slate-600">
+<p className="mt-6 text-sm lg:text-lg  lg:leading-8  leading-6 text-slate-600">
 
 {featured.description}
 
@@ -159,7 +159,7 @@ Kindergarten (KG)
 
 key={item}
 
-className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-4 py-2"
+className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-4"
 
 >
 
@@ -185,10 +185,10 @@ className="text-pink-500"
 
 <div>
 
-<h4 className="font-bold text-navy">Subjects</h4>
+<h4 className="font-bold text-navy hidden ">Subjects</h4>
 
 {/* Mobile dropdown */}
-<div className="mt-5">
+<div>
   {/* Button visible on small screens */}
   <button
     type="button"
@@ -214,19 +214,15 @@ className="text-pink-500"
 
 </div>
 
-<Link
-
-href="/contact"
-
-className="mt-10 inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 px-8 py-4 font-semibold text-white shadow-xl"
-
->
-
-Book Free Demo
-
-<ArrowRight size={18}/>
-
-</Link>
+<div className="lg:col-span-3 flex justify-center">
+  <Link
+    href="/contact"
+    className="inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 lg:px-8 lg:py-4 px-4 py-2 font-semibold text-white shadow-xl"
+  >
+    Book Free Demo
+    <ArrowRight size={18} />
+  </Link>
+</div>
 
 </div>
 
@@ -237,7 +233,7 @@ Book Free Demo
 
 {/* Bottom Note */}
 
-<div className="mx-auto mt-16 max-w-4xl rounded-full border border-primary/10 bg-white px-4 py-3 sm:px-6 md:px-8 shadow-lg">
+<div className="mx-auto hidden mt-16 max-w-4xl rounded-full border border-primary/10 bg-white px-4 py-3 sm:px-6 md:px-8 shadow-lg">
 
   <p className="text-center text-slate-600">
 

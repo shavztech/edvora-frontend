@@ -13,7 +13,7 @@ export default function ProgramsCTA() {
 
         {/* CTA Card */}
 
-        <div className="rounded-[30px] border border-secondary/100 bg-secondary/5 px-8 py-5 shadow-[0_15px_40px_rgba(15,23,42,0.06]">
+        <div className="rounded-[30px] border border-secondary/100 bg-secondary/5 px-8 py-4  shadow-[0_15px_40px_rgba(15,23,42,0.06]">
 
           {/* Small Badge */}
 
@@ -29,7 +29,7 @@ export default function ProgramsCTA() {
 
           {/* Heading */}
 
-          <h2 className="mt-6 text-center text-3xl font-black leading-tight text-navy md:text-4xl">
+          <h2 className=" text-center text-3xl font-black leading-tight text-navy md:text-4xl">
 
             Ready to Begin Your
 
@@ -41,22 +41,20 @@ export default function ProgramsCTA() {
 
           </h2>
 
-           <p className="relative mx-auto mt-6 max-w-3xl text-center text-base leading-8 text-slate-600">
-
-            Join thousands of students learning with expert mentors,
-            interactive live classes and personalized guidance designed
-            to unlock every learner's true potential.
-
-          </p>
+          <p className="relative mx-auto mt-6 hidden max-w-3xl text-center text-base leading-8 text-slate-600 md:block">
+  Join thousands of students learning with expert mentors,
+  interactive live classes and personalized guidance designed
+  to unlock every learner's true potential.
+</p>
 
          
           {/* Buttons */}
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
 
-            <Link
+            <Link 
               href="/demo-booking"
-              className="inline-flex items-center gap-3 rounded-full bg-secondary px-8 py-3.5 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="inline-flex items-center gap-3 rounded-full bg-secondary lg:px-8 lg:py-3.5 px-4 py-2 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               Book Free Demo
 
@@ -66,7 +64,7 @@ export default function ProgramsCTA() {
 
             <Link
               href="/programs"
-              className="inline-flex items-center gap-3 rounded-full border border-primary/20 px-8 py-3.5 font-semibold text-primary transition-all duration-300 hover:border-primary bg-primary text-white"
+              className="inline-flex items-center gap-3 rounded-full border border-primary/20 lg:px-8 lg:py-3.5 px-4 py-2 font-semibold text-primary transition-all duration-300 hover:border-primary bg-primary text-white"
             >
               Explore Programs
                           </Link>
