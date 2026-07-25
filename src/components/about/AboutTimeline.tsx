@@ -1,11 +1,6 @@
-
-
-
-
-
-
 "use client";
 
+import { motion } from "framer-motion";
 import {
   Rocket,
   School,
@@ -18,7 +13,7 @@ const timeline = [
     year: "2022",
     title: "Edvora Founded",
     description:
-      "Started with a vision to transform KG–12 education through technology and expert mentorship.",
+      "Started with a vision to transform KG–12 education through technology & experts.",
     icon: Rocket,
     color: "from-primary to-blue-500",
   },
@@ -48,19 +43,43 @@ const timeline = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.25,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 60,
+    scale: 0.95,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  },
+};
+
 export default function AboutTimeline() {
   return (
     <section className="relative py-1 lg:py-2 overflow-hidden">
 
       {/* Background Glow */}
-
       <div className="absolute -top-24 left-0 w-72 h-72 bg-primary/10 rounded-full blur-[120px]" />
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-secondary/10 rounded-full blur-[120px]" />
 
       <div className="relative max-w-7xl mx-auto px-6">
 
         {/* Heading */}
-
         <div className="text-center mb-10">
 
           <span className="inline-flex px-5 py-2 rounded-full bg-secondary/10 text-secondary font-semibold mb-6">
@@ -79,38 +98,47 @@ export default function AboutTimeline() {
         </div>
 
         {/* Desktop Timeline */}
-
         <div className="hidden lg:block relative">
 
           {/* Line */}
-
           <div className="absolute top-12 left-0 w-full border-t-4 border-dashed border-primary/20" />
 
-          <div className="grid grid-cols-4 gap-8 relative">
-
-            {timeline.map((item, index) => {
+          <motion.div
+            className="grid grid-cols-4 gap-8 relative"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >            {timeline.map((item, index) => {
               const Icon = item.icon;
 
               return (
-                <div
+                <motion.div
                   key={index}
+                  variants={cardVariants}
                   className="relative text-center group"
                 >
-
                   {/* Icon */}
-
-                  <div
+                  <motion.div
+                    whileHover={{
+                      scale: 1.1,
+                      rotate: 5,
+                    }}
+                    transition={{ duration: 0.3 }}
                     className={`mx-auto w-20 h-20 rounded-full bg-gradient-to-br ${item.color}
-                    flex items-center justify-center text-white shadow-xl
-                    transition duration-500 group-hover:scale-110`}
+                    flex items-center justify-center text-white shadow-xl`}
                   >
                     <Icon size={34} />
-                  </div>
+                  </motion.div>
 
                   {/* Card */}
-
-                  <div className="mt-10 rounded-[30px] bg-white/80 backdrop-blur-xl border border-white shadow-[0_20px_60px_rgba(59,111,182,0.08)] p-7 transition duration-500 hover:-translate-y-3 hover:shadow-[0_25px_70px_rgba(59,111,182,0.18)]">
-
+                  <motion.div
+                    whileHover={{
+                      y: -12,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-10 rounded-[30px] bg-white/80 backdrop-blur-xl border border-white shadow-[0_20px_60px_rgba(59,111,182,0.08)] p-7 hover:shadow-[0_25px_70px_rgba(59,111,182,0.18)]"
+                  >
                     <h3 className="text-primary text-3xl font-black">
                       {item.year}
                     </h3>
@@ -122,14 +150,11 @@ export default function AboutTimeline() {
                     <p className="mt-4 text-slate-600 leading-relaxed">
                       {item.description}
                     </p>
-
-                  </div>
-
-                </div>
+                  </motion.div>
+                </motion.div>
               );
             })}
-
-          </div>
+          </motion.div>
 
         </div>
 
@@ -139,30 +164,42 @@ export default function AboutTimeline() {
 
           <div className="absolute left-8 top-0 bottom-0 w-[3px] bg-gradient-to-b from-primary to-secondary rounded-full"></div>
 
-          <div className="space-y-10">
-
-            {timeline.map((item, index) => {
+          <motion.div
+            className="space-y-10"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >            {timeline.map((item, index) => {
               const Icon = item.icon;
 
               return (
-                <div
+                <motion.div
                   key={index}
+                  variants={cardVariants}
                   className="relative pl-20"
                 >
-
                   {/* Icon */}
-
-                  <div
+                  <motion.div
+                    whileHover={{
+                      scale: 1.1,
+                      rotate: 5,
+                    }}
+                    transition={{ duration: 0.3 }}
                     className={`absolute left-0 top-2 w-16 h-16 rounded-full bg-gradient-to-br ${item.color}
                     flex items-center justify-center text-white shadow-xl`}
                   >
                     <Icon size={28} />
-                  </div>
+                  </motion.div>
 
                   {/* Card */}
-
-                  <div className="rounded-3xl bg-white/80 backdrop-blur-xl border border-white shadow-xl p-6">
-
+                  <motion.div
+                    whileHover={{
+                      y: -8,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="rounded-3xl bg-white/80 backdrop-blur-xl border border-white shadow-xl p-6"
+                  >
                     <span className="text-primary text-2xl font-black">
                       {item.year}
                     </span>
@@ -174,14 +211,11 @@ export default function AboutTimeline() {
                     <p className="mt-3 text-slate-600 leading-relaxed">
                       {item.description}
                     </p>
-
-                  </div>
-
-                </div>
+                  </motion.div>
+                </motion.div>
               );
             })}
-
-          </div>
+          </motion.div>
 
         </div>
 
@@ -189,4 +223,3 @@ export default function AboutTimeline() {
     </section>
   );
 }
-

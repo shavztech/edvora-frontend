@@ -33,7 +33,7 @@ export default function Banner() {
   }, [pathname]);
 
   return (
-    <section className="relative text-gray-900 overflow-hidden py-6 lg:py-5">
+    <section className="relative text-gray-900 overflow-hidden py-6 lg:py-5 ">
       {/* 3D AMBIENT LIGHT BLOBS (BACKGROUND GLOW) */}
       <div className="absolute top-[-10%] left-[-15%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] rounded-full bg-primary/20 blur-[100px] md:blur-[140px] animate-glow-pulse-slow pointer-events-none " />
       <div className="absolute bottom-[-10%] right-[-15%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] rounded-full bg-secondary/15 blur-[120px] md:blur-[160px] animate-glow-pulse pointer-events-none" />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   FileText,
   Users,
@@ -48,9 +49,27 @@ const journeySteps = [
   },
 ];
 
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 70,
+    scale: 0.92,
+  },
+  visible: (delay) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      delay,
+     
+    },
+  }),
+};
+
 export default function LearningJourney() {
-  // Group into pairs (supporting odd number of steps)
   const stepPairs = [];
+
   for (let i = 0; i < journeySteps.length; i += 2) {
     stepPairs.push([journeySteps[i], journeySteps[i + 1]]);
   }
@@ -75,98 +94,59 @@ export default function LearningJourney() {
           </span>
 
           <h2 className="text-4xl md:text-5xl font-[950] text-navy leading-tight -mt-4">
-            Your Path to Becoming an<br/>
+            Your Path to Becoming an
+            <br />
 
             <span className="bg-gradient-to-r from-primary via-blue-500 to-secondary bg-clip-text text-transparent">
               Edvora Educator
-
             </span>
-
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-slate-600">
-
             Our streamlined onboarding process is designed to help you start
             teaching and sharing your knowledge in just a few simple steps.
-
           </p>
 
         </div>
 
-        {/* Connected Compact Timeline (Side-by-Side) */}
+        {/* Timeline */}
 
         <div className="relative mt-20 max-w-5xl mx-auto">
 
-          {/* Center Connector Line */}
+          {/* Center Line */}
 
-          <div className="absolute left-1/2 top-0 hidden h-full w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-primary via-secondary to-primary lg:block -mt-10 " />
+          <div className="absolute left-1/2 top-0 hidden h-full w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-primary via-secondary to-primary lg:block -mt-10" />
 
           <div className="space-y-12 lg:space-y-16">
 
             {stepPairs.map((pair, rowIndex) => {
+
               const stepLeft = pair[0];
-              const stepRight = pair[1]; // might be undefined
+              const stepRight = pair[1];
+
               const IconLeft = stepLeft.icon;
               const IconRight = stepRight ? stepRight.icon : null;
 
               return (
+
                 <div
                   key={rowIndex}
                   className="relative grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-24 items-stretch"
                 >
-                  {/* Timeline Dot in the center */}
+
+                  {/* Center Dot */}
 
                   <div className="absolute left-1/2 top-1/2 hidden h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white bg-primary shadow-md lg:block -mt-5" />
+                                    {/* Right Card - Appears First */}
 
-                  {/* Left Card */}
-
-                  <div className="flex justify-center lg:justify-end h-full -mt-6 lg:-mt-6">
-
-                    <div className="group relative w-full max-w-[380px] h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-white/20 bg-white/30 backdrop-blur-md p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-
-                      {/* Accent Glow */}
-
-                      <div
-                        className={`absolute -right-8 -top-8 h-20 w-20 rounded-full bg-gradient-to-br ${stepLeft.color} opacity-10 blur-xl transition-all duration-500 group-hover:scale-125`}
-                      />
-
-                      {/* Top Row: Icon */}
-
-                      <div className="flex justify-between items-center">
-                        <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stepLeft.color} text-white shadow-md transition duration-300 group-hover:rotate-3 group-hover:scale-105`}>
-                          <IconLeft size={20} />
-                        </div>
-                        <span className={`text-xs font-semibold text-white bg-gradient-to-r ${stepLeft.color} px-3 py-1 rounded-full border border-white/30 shadow-md`}
-                         >{stepLeft.number}</span>
-                      </div>
-
-                    
-
-                      {/* Title */}
-<h3 className="mt-1 text-lg font-bold text-navy">
-                        {stepLeft.title}
-                      </h3>
-
-                      {/* Description */}
-
-                      <p className="mt-2 text-base text-slate-600 leading-relaxed">
-                        {stepLeft.description}
-                      </p>
-
-                      {/* Bottom Border Accent */}
-
-                      <div
-                        className={`absolute bottom-0 left-0 h-1 w-full scale-x-0 bg-gradient-to-r ${stepLeft.color} origin-left transition-transform duration-350 group-hover:scale-x-100`}
-                      />
-
-                    </div>
-
-                  </div>
-
-                  {/* Right Card */}
-
-                  <div className="flex justify-center lg:justify-start h-full -mt-6 lg:-mt-10 lg:-mt-6">
-
+                  <motion.div
+                    className="order-2 lg:order-2 flex justify-center lg:justify-start h-full lg:pl-12"
+                    variants={cardVariants}
+                    custom={rowIndex * 0.6}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
                     {stepRight ? (
                       <div className="group relative w-full max-w-[380px] h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-white/20 bg-white/30 backdrop-blur-md p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
 
@@ -176,15 +156,23 @@ export default function LearningJourney() {
                           className={`absolute -right-8 -top-8 h-20 w-20 rounded-full bg-gradient-to-br ${stepRight.color} opacity-10 blur-xl transition-all duration-500 group-hover:scale-125`}
                         />
 
-                        {/* Top Row: Icon */}
+                        {/* Icon + Number */}
 
                         <div className="flex justify-between items-center">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stepRight.color} text-white shadow-md transition duration-300 group-hover:rotate-3 group-hover:scale-105`}>
+
+                          <div
+                            className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stepRight.color} text-white shadow-md transition duration-300 group-hover:rotate-3 group-hover:scale-105`}
+                          >
                             {IconRight && <IconRight size={20} />}
                           </div>
-                          <span className={`text-xs font-semibold text-white bg-gradient-to-r ${stepRight.color} px-3 py-1 rounded-full border border-white/30 shadow-md`}>{stepRight.number}</span>
-                        </div>
 
+                          <span
+                            className={`text-xs font-semibold text-white bg-gradient-to-r ${stepRight.color} px-3 py-1 rounded-full border border-white/30 shadow-md`}
+                          >
+                            {stepRight.number}
+                          </span>
+
+                        </div>
 
                         {/* Title */}
 
@@ -198,27 +186,82 @@ export default function LearningJourney() {
                           {stepRight.description}
                         </p>
 
-                        {/* Bottom Border Accent */}
+                        {/* Bottom Border */}
 
                         <div
-                          className={`absolute bottom-0 left-0 h-1 w-full scale-x-0 bg-gradient-to-r ${stepRight.color} origin-left transition-transform duration-350 group-hover:scale-x-100`}
+                          className={`absolute bottom-0 left-0 h-1 w-full scale-x-0 bg-gradient-to-r ${stepRight.color} origin-left transition-transform duration-300 group-hover:scale-x-100`}
                         />
 
                       </div>
                     ) : (
-                      <div className="w-full max-w-[380px] hidden lg:block" />
+                      <div className="hidden lg:block w-full max-w-[380px]" />
                     )}
+                  </motion.div>
 
-                  </div>
+                  {/* Left Card - Appears Second */}
+
+                  <motion.div
+                    className="order-1 lg:order-1 flex justify-center lg:justify-end h-full lg:pr-12"
+                    variants={cardVariants}
+                    custom={rowIndex * 0.6 + 0.3}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
+                    <div className="group relative w-full max-w-[380px] h-full flex flex-col justify-between overflow-hidden rounded-2xl border border-white/20 bg-white/30 backdrop-blur-md p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+
+                      {/* Accent Glow */}
+
+                      <div
+                        className={`absolute -right-8 -top-8 h-20 w-20 rounded-full bg-gradient-to-br ${stepLeft.color} opacity-10 blur-xl transition-all duration-500 group-hover:scale-125`}
+                      />
+
+                      {/* Icon + Number */}
+
+                      <div className="flex justify-between items-center">
+
+                        <div
+                          className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stepLeft.color} text-white shadow-md transition duration-300 group-hover:rotate-3 group-hover:scale-105`}
+                        >
+                          <IconLeft size={20} />
+                        </div>
+
+                        <span
+                          className={`text-xs font-semibold text-white bg-gradient-to-r ${stepLeft.color} px-3 py-1 rounded-full border border-white/30 shadow-md`}
+                        >
+                          {stepLeft.number}
+                        </span>
+
+                      </div>
+
+                      {/* Title */}
+
+                      <h3 className="mt-1 text-lg font-bold text-navy">
+                        {stepLeft.title}
+                      </h3>
+
+                      {/* Description */}
+
+                      <p className="mt-2 text-base text-slate-600 leading-relaxed">
+                        {stepLeft.description}
+                      </p>
+
+                      {/* Bottom Border */}
+
+                      <div
+                        className={`absolute bottom-0 left-0 h-1 w-full scale-x-0 bg-gradient-to-r ${stepLeft.color} origin-left transition-transform duration-300 group-hover:scale-x-100`}
+                      />
+
+                    </div>
+
+                  </motion.div>
 
                 </div>
               );
             })}
-
-          </div>
+                      </div>
 
         </div>
-
 
       </div>
 

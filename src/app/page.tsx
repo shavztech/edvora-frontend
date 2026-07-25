@@ -11,7 +11,7 @@ import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-2">
+    <main className="min-h-screen px-1">
       {/* Full Width Hero */}
     
 
