@@ -73,6 +73,16 @@ export default function Banner() {
                     and Growth
                   </span>
                 </h1>
+                {/* Mobile & Tablet Banner Image */}
+<div className="relative w-full h-[260px] sm:h-[340px] mt-6 lg:hidden">
+  <Image
+    src="/banner.png"
+    alt="Learning"
+    fill
+    priority
+    className="object-contain"
+  />
+</div>
 
                 <p
                   className="text-slate-600 text-base md:text-lg leading-relaxed opacity-0 animate-slide-left-smooth"
