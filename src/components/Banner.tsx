@@ -82,15 +82,7 @@ export default function Banner() {
                   mentors, structured courses, and interactive tools to track your
                   progress and achievements.
                 </p>
-                <div className="block md:hidden mt-8 mb-4">
-                  <Image
-                    src="/about/about-hero.png"
-                    alt="Banner image"
-                    width={600}
-                    height={400}
-                    className="w-full object-cover rounded-lg"
-                  />
-                </div>
+                
               </div>
 
               {/* BUTTONS */}
@@ -202,7 +194,7 @@ export default function Banner() {
 
               <div className="relative w-full h-full rounded-[2.3rem] overflow-hidden bg-gradient-to-br from-sky-50 to-emerald-50">
                 <Image
-                  src="/about/about-hero-2.png"
+                  src="/banner.png"
                   alt=" learning"
                   fill
                   priority
