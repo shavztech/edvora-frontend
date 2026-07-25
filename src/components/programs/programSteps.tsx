@@ -66,7 +66,7 @@ const journeySteps = [
 
 export default function LearningJourney() {
   return (
-    <section className="relative overflow-hidden py-6 lg:py-8">
+    <section className="relative overflow-hidden py-5 lg:py-8">
 
       {/* Background Glow */}
 
@@ -115,19 +115,19 @@ export default function LearningJourney() {
         </div>
         {/* Timeline */}
 
-<div className="mt-20">
+<div className="mt-6">
 
   <div className="grid gap-10 lg:grid-cols-2">
 
     {/* ================= LEFT COLUMN ================= */}
 
-    <div className="space-y-8">
+    <div className="space-y-4">
 
       {journeySteps.slice(0, 3).map((item) => (
 
         <div
           key={item.step}
-          className="group flex items-center gap-6 -mt-10"
+          className="group flex items-center gap-6 space-y-2"
         >
 
           {/* Step Icon */}
@@ -140,9 +140,9 @@ export default function LearningJourney() {
 
           {/* Card */}
 
-          <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-x-2 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)]">
+          <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90  lg:p-4 md:p-3 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-x-2 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)] py-2">
 
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3">
 
               <img
                 src={item.image}
@@ -178,28 +178,28 @@ export default function LearningJourney() {
 
     {/* ================= RIGHT COLUMN ================= */}
 
-        <div className="space-y-8">
+        <div className="space-y-4 -mt-6  lg:mt-0">
 
       {journeySteps.slice(3, 6).map((item) => (
 
         <div
           key={item.step}
-          className="group flex items-center gap-6 -mt-10"
+          className="group flex items-center gap-6 space-y-2"
         >
 
           {/* Step Icon */}
 
           <div
-            className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-r ${item.color} text-2xl font-black text-white shadow-[0_10px_30px_rgba(59,111,182,.25)]`}
+            className={`flex h-20 w-20  shrink-0 items-center justify-center rounded-full bg-gradient-to-r ${item.color} text-2xl font-black text-white shadow-[0_10px_30px_rgba(59,111,182,.25)]`}
           >
             {item.step}
           </div>
 
           {/* Card */}
 
-          <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-x-2 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)]">
+          <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90 lg:p-4 md:p-3 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-x-2 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)] py-2">
 
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3">
 
               <img
                 src={item.image}
@@ -238,7 +238,7 @@ export default function LearningJourney() {
   </div>
         {/* ================= STEP 7 (CENTER) ================= */}
 
-      <div className="mt-12 flex justify-center">
+      <div className="mt-6 flex justify-center">
 
         <div className="w-full max-w-2xl">
 
@@ -257,9 +257,9 @@ export default function LearningJourney() {
 
             {/* Card */}
 
-            <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-y-1 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)]">
+            <div className="relative flex-1 overflow-hidden rounded-[28px] border border-white/60 bg-white/90 lg:p-4 md:p-3 shadow-[0_18px_45px_rgba(15,23,42,.08)] backdrop-blur-xl transition-all duration-500 group-hover:translate-y-1 group-hover:shadow-[0_25px_60px_rgba(59,111,182,.15)]">
 
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-3">
 
                 <img
                   src={journeySteps[6].image}
@@ -298,7 +298,7 @@ export default function LearningJourney() {
         
           {/* Bottom Note */}
 
-          <div className="mt-20 flex justify-center">
+          <div className="mt-8 lg:mt-20 flex justify-center">
 
             <div className="rounded-full border border-primary/10 bg-white/80 px-8 py-4 shadow-lg backdrop-blur-xl">
 

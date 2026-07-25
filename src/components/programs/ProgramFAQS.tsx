@@ -32,7 +32,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden ">
       <div className="relative mx-auto max-w-7xl px-6">
         {/* Heading */}
         <div className="text-center">
@@ -40,7 +40,7 @@ export default function FAQ() {
              FAQs
           </span>
 
-          <h2 className="text-4xl md:text-5xl font-[950] text-navy leading-tight">
+          <h2 className=" text-4xl md:text-5xl font-[950] text-navy leading-tight -mt-6">
             Have Questions?{" "}<br/>
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               We're Here to Help.

@@ -58,7 +58,7 @@ const programs = [
 
   {
     title: "Personality\nDevelopment",
-    image: "/programs/personality development-2.png",
+    image: "/programs/personality_development-2.png",
     gradient: "from-[#F59E0B] via-[#FBBF24] to-[#EA580C]",
     badge: "Life Skills",
     description:
