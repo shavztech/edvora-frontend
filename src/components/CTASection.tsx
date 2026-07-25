@@ -51,7 +51,7 @@ export default function ProgramCTA() {
 
         {/* CTA Cards */}
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-3">
+        <div className="mt-8 grid gap-8  md:grid-cols-2 lg:grid-cols-3">
                     {/* Card 1 */}
 
           <div className="group relative overflow-hidden rounded-[32px] border border-white/70 bg-white/80 p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(59,111,182,.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(59,111,182,.18)]">
