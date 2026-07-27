@@ -16,7 +16,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="relative mb-22 overflow-hidden bg-[rgb(var(--edvora-primary))] text-white">
+    <footer className="relative  overflow-hidden bg-[rgb(var(--edvora-primary))] text-white">
 
       {/* Background Glow */}
       <div className="absolute -left-32 -top-40 h-[350px] w-[350px] rounded-full bg-primary/15 blur-[120px]" />
@@ -43,7 +43,7 @@ export default function Footer() {
               </Link>
             </div>
 
-            <p className="mx-auto mt-2 max-w-md leading-8 text-white/75 md:mx-0">
+            <p className="mx-auto lg:mt-2 -mt-3 max-w-md leading-6 lg:leading-8 text-white/75 md:mx-0">
               Empowering students from Kindergarten to Grade 12 through
               personalized one-to-one online learning, expert mentors,
               and future-ready education.

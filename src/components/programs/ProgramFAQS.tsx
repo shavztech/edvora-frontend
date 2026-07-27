@@ -33,9 +33,9 @@ export default function FAQ() {
 
   return (
     <section className="relative overflow-hidden ">
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative mx-auto max-w-7xl px-6 mb-16 md:mb-20 lg:mb-24">
         {/* Heading */}
-        <div className="text-center">
+        <div className="text-center ">
           <span className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-5 py-2 text-secondary font-bold uppercase tracking-[0.3em] text-xs mb-6">
              FAQs
           </span>
