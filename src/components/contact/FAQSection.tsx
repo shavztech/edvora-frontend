@@ -27,7 +27,7 @@ export default function FAQSection() {
   const [active, setActive] = useState<number | null>(0);
 
   return (
-    <section className="relative overflow-hidden py-3  lg:py-2">
+    <section className="relative overflow-hidden py-3  lg:py-2 mb-6 md:mb-6 lg:mb-8">
 
       {/* Background Glow */}
 

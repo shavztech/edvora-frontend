@@ -4,7 +4,7 @@ export default function CareerCTA() {
   return (
           <section className="mt-0 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-0">
 
-<div className="overflow-hidden rounded-[36px] bg-gradient-to-r from-primary via-[#4b7bc4] to-secondary p-[1px]">
+<div className="overflow-hidden rounded-[36px] bg-gradient-to-r from-primary via-[#4b7bc4] to-secondary p-[1px]  mb-9 lg:mb-8">
 
 <div className="rounded-[35px] bg-white/90 px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 backdrop-blur-xl">
           <div className="flex flex-col items-center justify-between gap-8 text-center lg:flex-row lg:text-left">

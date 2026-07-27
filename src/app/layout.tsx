@@ -37,9 +37,8 @@ export default function RootLayout({
           <Navbar />
           <Toaster position="top-right" />
           {children}
-          <div className="mt-22 lg:mt-16">
-            <Footer />
-              </div>
+          <Footer />
+        
         </SidebarProvider>
         
       </body>

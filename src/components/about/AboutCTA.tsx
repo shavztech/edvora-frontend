@@ -6,11 +6,11 @@ import { ArrowRight } from "lucide-react";
 
 export default function CTASection() {
   return (
-    <section className="py-6 lg:py-9">
+    <section className="py-6 lg:py-9 ">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* CTA Banner */}
-        <div className="relative overflow-hidden rounded-[35px] bg-gradient-to-r from-primary via-navy to-primary px-6 py-5 md:px-10 md:py-6 lg:px-14 lg:py-8 shadow-[0_25px_60px_rgba(59,117,177,0.35)]">
+        <div className="relative overflow-hidden rounded-[35px] bg-gradient-to-r from-primary via-navy to-primary px-6 py-5 md:px-10 md:py-6 lg:px-14 lg:py-8  mb-2 mb:mb-2 lg:mb-4 shadow-[0_25px_60px_rgba(59,117,177,0.35)]">
 
           {/* Left Bag */}
           <div className="absolute left-0 bottom-0 z-0 hidden md:block">
