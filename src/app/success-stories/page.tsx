@@ -18,7 +18,7 @@ import {
 
 export default function SuccessStoriesPage() {
   return (
-    <section className="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto px-6 py-20">
+    <section className="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto px-1 py-20 ">
       {/* Left side – text */}
       <div className="flex-1 space-y-6">
         <span className="inline-flex items-center gap-2.5 rounded-full bg-primary/10 pl-2 pr-4 py-1.5 text-primary font-semibold text-sm">
